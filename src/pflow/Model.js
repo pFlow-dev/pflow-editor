@@ -13,9 +13,9 @@ export class Model extends Dsl {
 
     if (declaration instanceof Function) { // provided a function DSL
       declaration(
-          this.role.bind(this),
-          this.cell.bind(this),
           this.fn.bind(this),
+          this.cell.bind(this),
+          this.role.bind(this),
       );
       this.reindex();
     } else if (!!declaration) { // pre-indexed model

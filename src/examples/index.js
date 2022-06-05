@@ -4,10 +4,10 @@ export const defaultCollection = 'examples'
 export const defaultModel = 'metamodel'
 
 // Provide an example model by default
-domodel(defaultCollection, defaultModel, (role, cell, fn, param) => {});
+domodel(defaultCollection, defaultModel, (fn, cell, role) => {});
 
 // A built-in example for testing
-domodel('examples', 'metamodel', (role, cell, fn) => {
+domodel('examples', 'metamodel', (fn, cell, role) => {
     const defaultRole = role("default")
     // lambda style assignment
     const foo = cell("foo", 1, 0, {x: 170, y: 230})
