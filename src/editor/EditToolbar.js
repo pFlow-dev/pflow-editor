@@ -1,23 +1,35 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import {DialogTitle, Select, MenuItem} from "@mui/material";
+import {DialogTitle, Select, MenuItem, Tooltip, IconButton} from "@mui/material";
+import CameraIcon from '@mui/icons-material/Camera';
+import {ControlCamera} from "@mui/icons-material";
+
 
 
 export default function EditToolbar(props) {
-  let source = props.metaModel.getSource() || { path: ""}
+    let source = props.metaModel.getSource() || { path: ""}
+    console.log(source, 'source')
+    let imageUrl = "#"
+    if (source.model && source.model.cid) {
+        const state = props.metaModel.getState()
+        if (state) {
+            imageUrl = "/image.svg?cid=" + source.model.cid + "&state=[" + state.join(',') + "]"
+        } else {
+            imageUrl = "/image.svg?cid=" + source.model.cid
+        }
 
+    }
     const handleChange = (e) => {
         props.metaModel.setModel(e.target.value);
     };
   return <React.Fragment>
-      <div sx={{ height: "1em", padding: "5px" }}>
-          &nbsp; <Select labelId="models" id="selected-model" value={props.metaModel.schema} onChange={handleChange} >
-              {props.metaModel.getModelList().map((val) =>
-                  <MenuItem value={val} key={val}>{val}</MenuItem>,
-              )}
-          </Select>
-         &nbsp; <u>{source.path}</u>
-      </div>
+      <Tooltip title="snapshot">
+          <a href={imageUrl} target="_blank" rel="noreferrer" >
+          <IconButton  href="">
+              <CameraIcon />
+          </IconButton>
+              {source?.model?.schema} </a>
+      </Tooltip>
   </React.Fragment>
 }
 

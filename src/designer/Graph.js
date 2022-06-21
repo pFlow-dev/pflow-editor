@@ -35,11 +35,11 @@ export default function Graph(props) {
           >
             <defs>
               <marker id="markerArrow1" markerWidth="23" markerHeight="13" refX="31" refY="6" orient="auto">
-                <rect className="transition" width="28" height="3" fill="#ffffff" stroke="#ffffff" x="3" y="5" />
+                <rect className="arrowSpace1" width="28" height="3" fill="#ffffff" stroke="#ffffff" x="3" y="5" />
                 <path d="M2,2 L2,11 L10,6 L2,2" />
               </marker>
               <marker id="markerInhibit1" markerWidth="23" markerHeight="13" refX="31" refY="6" orient="auto">
-                <rect className="transition" width="28" height="3" fill="#ffffff" stroke="#ffffff" x="3" y="5" />
+                <rect className="inhibitSpace1" width="28" height="3" fill="#ffffff" stroke="#ffffff" x="3" y="5" />
                 <circle cx="5" cy="6.5" r={4} />
               </marker>
             </defs>

@@ -94,6 +94,12 @@ class MetaModel {
     return this.mode === 'execute' && this.simulation != null;
   }
 
+  getState() {
+    if (this.isRunning()) {
+      return this.simulation.state
+    }
+  }
+
   getTokenCount(oid) {
     const p = this.getObj(oid);
     if (!p) {
