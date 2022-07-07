@@ -5,6 +5,7 @@ import Transition from './Transition';
 import PropTypes from "prop-types";
 
 class Model extends Component {
+
   render() {
     const p = this.props.metaModel.places;
     const t = this.props.metaModel.transitions;
@@ -26,7 +27,6 @@ class Model extends Component {
 
     for (const txn in t) {
       for (const place in t[txn].guards) {
-        console.log("guard: "+place)
         const id = txn+'-o'+place;
         arcs.push(
             <Arc key={id} id={id} metaModel={this.props.metaModel} source={place} target={txn} inhibitor={true} transition={t} />,

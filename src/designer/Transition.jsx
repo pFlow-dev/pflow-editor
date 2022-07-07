@@ -31,7 +31,7 @@ export default class Transition extends Node {
     }
 
     return (
-      <g transform="translate(-17,-17)"
+      <g
         onClick={this.onClick}
         onMouseDown={ (evt) => this.startDrag(evt) }
         onMouseUp={ (evt) => this.endDrag(evt) }
@@ -41,12 +41,12 @@ export default class Transition extends Node {
           evt.preventDefault();
           evt.stopPropagation();
         }} >
-        <circle id={this.props.id + '_handle'} cx={t.position.x + 17} cy={t.position.y + 17} r={this.getHandleWidth()} fill="transparent" stroke="transparent"/>
+        <circle id={this.props.id + '_handle'} cx={t.position.x } cy={t.position.y } r={this.getHandleWidth()} fill="transparent" stroke="transparent"/>
         <rect
           className="transition" width="34" height="34" fill={this.getFill()} stroke={this.getStroke()}
-          id={this.props.id} x={t.position.x} y={t.position.y}
+          id={this.props.id} x={t.position.x-17} y={t.position.y-17}
         />
-        <text id={this.props.id+'[label]'} x={t.position.x} y={t.position.y-8} className="small">{this.props.id}</text>
+        <text id={this.props.id+'[label]'} x={t.position.x-17} y={t.position.y-23} className="small">{this.props.id}</text>
       </g>
     );
   }

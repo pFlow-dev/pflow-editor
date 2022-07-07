@@ -1,16 +1,14 @@
 import React from 'react';
 import Model from './Model';
 import PropTypes from "prop-types";
-import DesignToolbar from "./DesignToolbar";
-import {Paper} from "@mui/material";
 
 /**
- * Graph renders the model as an SVG
+ * Designer renders the model as an SVG
  * @param props
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Graph(props) {
+export default function Designer(props) {
   const onClick = (evt) => {
     props.metaModel.editorClick(evt);
   };
@@ -21,13 +19,8 @@ export default function Graph(props) {
      setSvgWidth(window.screen.width)
  });
 
-  return (
-      <React.Fragment>
-        <Paper sx={{marginBottom: "5px"}}>
-          <DesignToolbar metaModel={props.metaModel}/>
-        </Paper>
-        <Paper sx={{marginBottom: "5px"}}>
-          <svg id={props.metaModel.schema}
+  return <React.Fragment>
+            <svg id={props.metaModel.schema}
             width={svgWidth}
             height={600}
             onContextMenu={(evt) => evt.preventDefault() }
@@ -45,11 +38,9 @@ export default function Graph(props) {
             </defs>
             <Model metaModel={props.metaModel} />
           </svg>
-          </Paper>
-      </React.Fragment>
-  );
+  </React.Fragment>
 }
 
-Graph.propTypes = {
+Designer.propTypes = {
     metaModel: PropTypes.object
 }

@@ -4,10 +4,6 @@ export default function NewMetaModel(props) {
   return new MetaModel(props);
 }
 
-// account for visual skew clicking-to-add an element
-const HEADER_OFFSET = 20;
-const MARGIN_OFFSET = 8
-
 class MetaModel {
   constructor(props) {
     // inject extra attributes
@@ -224,7 +220,7 @@ class MetaModel {
       capacity: 0,
       offset: newOffset,
       // KLUDGE this allows for the size of the menu bar
-      position: {x: coords.x+MARGIN_OFFSET, y: coords.y-HEADER_OFFSET},
+      position: {x: coords.x, y: coords.y},
     };
 
     // extend delta vector size
@@ -241,7 +237,7 @@ class MetaModel {
       label: oid,
       role: 'default',
       delta: this.emptyVector(),
-      position: {x: coords.x, y: coords.y-HEADER_OFFSET},
+      position: {x: coords.x, y: coords.y},
       guards: {},
     };
     return true;
@@ -251,11 +247,11 @@ class MetaModel {
     let updated = false;
     switch (this.mode) {
       case 'place': {
-        updated = this.addPlace({x: evt.clientX-8, y: evt.clientY-25});
+        updated = this.addPlace({x: evt.clientX, y: evt.clientY});
         break;
       }
       case 'transition': {
-        updated = this.addTransition({x: evt.clientX, y: evt.clientY-25});
+        updated = this.addTransition({x: evt.clientX, y: evt.clientY});
         break;
       }
       default: {

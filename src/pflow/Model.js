@@ -21,6 +21,9 @@ export class Model extends Dsl {
     } else if (!!declaration) { // pre-indexed model
       this.places = declaration.places;
       this.transitions = declaration.transitions;
+      this.cid = declaration.cid
+      this.path = declaration.path
+      this.markdown = declaration.markdown || '# '+schema
       this.frozen = true;
     }
   }

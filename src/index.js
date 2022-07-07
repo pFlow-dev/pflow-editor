@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import PflowEditor from './components/PflowEditor';
-import {defaultCollection, defaultModel} from "./examples";
+import IndexPage from "./pages/IndexPage";
 
-const params = new URLSearchParams(window.location.search.slice(1));
-ReactDOM.render(<PflowEditor collection={params.get('collection') || defaultCollection} selected={params.get('model') || defaultModel} />, document.getElementById('root'));
+
+ReactDOM.render( <IndexPage/>, document.getElementById("root")
+);
