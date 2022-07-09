@@ -13,12 +13,11 @@ export default class IndexPage extends Component {
         super(props);
         this.setModel = this.setModel.bind(this);
         this.readModels = this.readModels.bind(this);
-        //this.pollModels = this.pollModels.bind(this);
+        this.pollModels = this.pollModels.bind(this);
         this.loadModelFromResponse = this.loadModelFromResponse.bind(this);
 
         this.componentDidMount = () => {
-            this.readModels() //.then(this.pollModels)
-            //this.setModel(props.metaModel)
+            this.readModels().then(this.pollModels)
         }
     }
 
@@ -54,20 +53,20 @@ export default class IndexPage extends Component {
             })
     }
 
-    // async pollModels() {
-    //     let source = new EventSource("/sse?stream=models", {withCredentials: true})
-    //     let last = ""
-    //     source.addEventListener("message", (evt) => {
-    //         let e = JSON.parse(evt.data)
-    //         if (last != e.cid) {
-    //             //console.log({e}, 'modified')
-    //             last = e.cid
-    //             this.readModels()
-    //         } else {
-    //             //console.log({e}, 'nochange')
-    //         }
-    //     })
-    // }
+    async pollModels() {
+        let source = new EventSource("/sse?stream=models", {withCredentials: true})
+        let last = ""
+        source.addEventListener("message", (evt) => {
+            let e = JSON.parse(evt.data)
+            if (last != e.cid) {
+                //console.log({e}, 'modified')
+                last = e.cid
+                this.readModels()
+            } else {
+                //console.log({e}, 'nochange')
+            }
+        })
+    }
 
     setModel(selected) {
         this.metaModel = NewMetaModel({
