@@ -21,13 +21,11 @@ export default class IndexPage extends Component {
         }
     }
 
-    loadModel(model, config) {
-        Repo.import(model.schema, model, config)
-        this.setModel(model.schema)
-    }
-
     loadModelFromResponse(response) {
         const reader = response.body.getReader();
+        const { run, view, state, help } = this.getParams()
+        const cid = run || view
+
         return reader.read().then((res) => {
             let decoder = new TextDecoder()
             let source = decoder.decode(res.value)
@@ -37,10 +35,15 @@ export default class IndexPage extends Component {
                 config = models.config
                 models = models.models // unpack new models.json format
             }
+            let currentSchema = ""
             for (let path of Object.keys(models)) {
-                this.loadModel(models[path], config[path])
-                break; // TODO: support reloading models
+                const m = models[path]
+                Repo.import(m.schema, m, config[path])
+                if (m.cid == cid) {
+                    currentSchema = m.schema
+                }
             }
+            this.setModel(currentSchema)
             return models
         })
     }
@@ -80,8 +83,7 @@ export default class IndexPage extends Component {
         })
         this.setState({selected})
     }
-
-    render() {
+    getParams() {
         const params = new URLSearchParams(location.search);
         const run = params.get("run");
         const view = params.get("view");
@@ -92,7 +94,11 @@ export default class IndexPage extends Component {
         if (stateVal) {
             state = JSON.parse(stateVal)
         }
+        return { run, view, state, help }
+    }
 
+    render() {
+        const { run, view, state, help } = this.getParams()
         if (view) {
             return <ViewPage model={view} state={state} metaModel={this.metaModel}/>
         } else if (run) {

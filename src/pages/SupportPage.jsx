@@ -61,7 +61,7 @@ export default function SupportPage(props) {
                                 Petri-net models bridge this gap -- serving as a <u>lossless abstraction built upon mathematical primitives</u>.
                             </p>
                             <p>
-                                This approach handles complexity without suffering from state-explosion that comes with real-world domains.
+                                This approach handles complexity without suffering from the state-explosion that comes with real-world problems.
                             </p>
                         </Typography>
                     </CardContent>
@@ -81,7 +81,7 @@ export default function SupportPage(props) {
                         <GitHub/>
                         <Button size="small">
                             <a href="https://github.com/pFlow-dev/pflow#readme" target="_blank" rel="noreferrer">
-                                Github Repo
+                                Visit Github Repo
                             </a>
                         </Button>
                     </CardActions>
