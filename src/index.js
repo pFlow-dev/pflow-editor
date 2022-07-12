@@ -4,5 +4,4 @@ import './index.css';
 import IndexPage from "./pages/IndexPage";
 
 
-ReactDOM.render( <IndexPage/>, document.getElementById("root")
-);
+ReactDOM.render( <IndexPage/>, document.getElementById("root"));

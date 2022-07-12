@@ -50,6 +50,9 @@ export default class DesignToolbar extends Component {
     let imageUrl = "#"
     const state = this.props.metaModel.getState()
     const m = this.props.metaModel.model()
+    if (! m) {
+      return (<React.Fragment/>);
+    }
     if (state) {
       imageUrl = "./?view=" + m.cid + "&state=[" + state.join(',') + "]"
     } else {

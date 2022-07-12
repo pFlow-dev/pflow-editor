@@ -3,9 +3,9 @@ import {Component} from 'react'
 import {Repo } from "../pflow";
 import NewMetaModel from "../pflow/MetaModel";
 import RunPage from "../pages/RunPage";
-import ViewPage from "./ViewPage";
 import CollectionPage from "./CollectionPage";
 import SupportPage from "./SupportPage";
+import ViewPage from "./ViewPage";
 
 export default class IndexPage extends Component {
 
@@ -36,12 +36,25 @@ export default class IndexPage extends Component {
                 models = models.models // unpack new models.json format
             }
             let currentSchema = ""
-            for (let path of Object.keys(models)) {
+            const paths = Object.keys(models)
+
+            for (let path of paths) {
                 const m = models[path]
                 Repo.import(m.schema, m, config[path])
-                if (m.cid == cid) {
+                if (m.cid == cid || paths.length === 1) {
                     currentSchema = m.schema
-                }
+                    // rewrite to load only model by default
+                    const url = new URL(window.location);
+                    if (!!run) {
+                        url.searchParams.set('run', m.cid);
+                        //location.replace(url)
+                        window.history.pushState({}, '', url);
+                    } else if (!!view) {
+                        url.searchParams.set('view', m.cid);
+                        //location.replace(url)
+                        window.history.pushState({}, '', url);
+                    }
+                } // REVIEW: single collections have special behavior: autoreload -f
             }
             this.setModel(currentSchema)
             return models
@@ -62,11 +75,11 @@ export default class IndexPage extends Component {
         source.addEventListener("message", (evt) => {
             let e = JSON.parse(evt.data)
             if (last != e.cid) {
-                //console.log({e}, 'modified')
+                console.log({e}, 'modified')
                 last = e.cid
                 this.readModels()
             } else {
-                //console.log({e}, 'nochange')
+                console.log({e}, 'nochange')
             }
         })
     }
@@ -83,6 +96,7 @@ export default class IndexPage extends Component {
         })
         this.setState({selected})
     }
+
     getParams() {
         const params = new URLSearchParams(location.search);
         const run = params.get("run");
@@ -100,9 +114,9 @@ export default class IndexPage extends Component {
     render() {
         const { run, view, state, help } = this.getParams()
         if (view) {
-            return <ViewPage model={view} state={state} metaModel={this.metaModel}/>
+            return <ViewPage state={state} metaModel={this.metaModel}/>
         } else if (run) {
-            return <RunPage model={run} state={state} metaModel={this.metaModel} />
+            return <RunPage state={state} metaModel={this.metaModel} />
         } else if (help) {
             return <SupportPage/>
         } else {

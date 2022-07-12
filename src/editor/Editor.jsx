@@ -5,6 +5,8 @@ import {Box} from '@mui/material';
 import PropTypes from "prop-types";
 import History from "./History";
 import Transition from "./Transition";
+import ReactMarkdown from "react-markdown";
+import SourceView from "../pages/SourceView";
 
 export default function Editor(props) {
   const selectedObj = props.metaModel.getCurrentObj();
@@ -42,6 +44,9 @@ export default function Editor(props) {
     }
     default: {
       return <React.Fragment>
+        <Box sx={{ m: 2 }}>
+          <SourceView metaModel={props.metaModel}/>
+        </Box>
       </React.Fragment>;
     }
   }

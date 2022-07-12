@@ -1,8 +1,11 @@
 import React from 'react';
-import {CardMedia, Container, Grid, Link, Tooltip} from "@mui/material";
+import {CardMedia, Container} from "@mui/material";
 import Card from "@mui/material/Card";
-import PropTypes from "prop-types";
 import TitleLink from "./TitleLink";
+
+import PropTypes from 'prop-types';
+import SourceView from "./SourceView";
+
 
 export default function ViewPage(props) {
     if (!props.metaModel) {
@@ -22,22 +25,18 @@ export default function ViewPage(props) {
         <Container sx={{ position: "absolute"}}>
             <TitleLink title={props.metaModel?.schema}/>
         </Container>
-        <Grid container>
-            <Grid item>
-                <Card >
-                    <a href={"?run="+m.cid}>
-                        <CardMedia>
-                            <img src={urlParams} />
-                        </CardMedia>
-                    </a>
-                </Card>
-            </Grid>
-        </Grid>
+        <Card >
+            <CardMedia>
+                <a href={"?run="+m.cid}>
+                    <img src={urlParams} />
+                </a>
+            </CardMedia>
+        </Card>
+        <SourceView metaModel={props.metaModel}/>
 </React.Fragment>;
 }
 
 ViewPage.propTypes = {
     metaModel: PropTypes.object,
-    model: PropTypes.string,
     state: PropTypes.array
 }

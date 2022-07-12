@@ -3,9 +3,8 @@ import Designer from '../designer/Designer';
 import '../App.css'
 import Editor from "../editor/Editor";
 import PropTypes from "prop-types";
-import {Container, Link, Paper, Tooltip} from "@mui/material";
+import {Container, Paper} from "@mui/material";
 import DesignToolbar from "../designer/DesignToolbar";
-import Typography from "@mui/material/Typography";
 import TitleLink from "./TitleLink";
 
 export default function RunPage(props) {
@@ -27,6 +26,5 @@ export default function RunPage(props) {
 
 RunPage.propTypes = {
     metaModel: PropTypes.object,
-    model: PropTypes.string,
     state: PropTypes.array,
 }

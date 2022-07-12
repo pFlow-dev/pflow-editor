@@ -17,6 +17,9 @@ export const Repo = new class {
     import(schema, modelDef, config) {
         this.models[schema] = modelDef;
         this.config[schema] = config;
+        // KLUDGE: should refactor models.json instead
+        this.models[schema]['source'] = config['source'];
+        this.models[schema]['markdown'] = config['markdown'];
     }
 
     listModels() {
