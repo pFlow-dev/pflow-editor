@@ -5,7 +5,6 @@ import {Box} from '@mui/material';
 import PropTypes from "prop-types";
 import History from "./History";
 import Transition from "./Transition";
-import ReactMarkdown from "react-markdown";
 import SourceView from "../pages/SourceView";
 
 export default function Editor(props) {

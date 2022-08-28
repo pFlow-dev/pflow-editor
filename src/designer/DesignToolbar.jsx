@@ -54,9 +54,9 @@ export default class DesignToolbar extends Component {
       return (<React.Fragment/>);
     }
     if (state) {
-      imageUrl = "./?view=" + m.cid + "&state=[" + state.join(',') + "]"
+      imageUrl = m.image+"?state=["+state.join(',')+"]"
     } else {
-      imageUrl = "./?view=" + m.cid
+      imageUrl = m.image
     }
 
 

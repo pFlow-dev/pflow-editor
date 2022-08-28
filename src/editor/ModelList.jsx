@@ -14,9 +14,7 @@ export default function ModelList() {
     if (models.length == 0) {
         return <React.Fragment/>
     }
-    // console.log({rows: models})
 
-    // TODO: use view-page as SVG thumbnail
     return (
         <TableContainer >
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -33,12 +31,12 @@ export default function ModelList() {
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             <TableCell component="th" scope="row">
-                                <Link href={"?run="+model.cid}>
-                                    <img width="300px" src={"../"+model.cid+"/image.svg"} />
+                                <Link href={"?cid="+model.source.cid+"&run="+model.cid}>
+                                    <img width="300px" src={model.image} />
                                 </Link>
                             </TableCell>
                             <TableCell>
-                                <Link href={"?view="+model.cid}>
+                                <Link href={"?cid="+model.source.cid+"&view="+model.cid}>
                                     {model.schema} - {model.path}
                                 </Link>
                             </TableCell>

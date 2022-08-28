@@ -23,42 +23,51 @@ export default class IndexPage extends Component {
 
     loadModelFromResponse(response) {
         const reader = response.body.getReader();
-        const { run, view, state, help } = this.getParams()
-        const cid = run || view
-
         return reader.read().then((res) => {
             let decoder = new TextDecoder()
             let source = decoder.decode(res.value)
             let models = JSON.parse(source)
-            let config = {}
-            if (models.version  == '0.1.0') {
-                config = models.config
-                models = models.models // unpack new models.json format
+            let params = this.getParams()
+            let found = false
+            for (let m of models) {
+                if (this.onImport(Repo.import(m), params)) {
+                    found = true
+                }
             }
-            let currentSchema = ""
-            const paths = Object.keys(models)
-
-            for (let path of paths) {
-                const m = models[path]
-                Repo.import(m.schema, m, config[path])
-                if (m.cid == cid || paths.length === 1) {
-                    currentSchema = m.schema
-                    // rewrite to load only model by default
-                    const url = new URL(window.location);
-                    if (!!run) {
-                        url.searchParams.set('run', m.cid);
-                        //location.replace(url)
-                        window.history.pushState({}, '', url);
-                    } else if (!!view) {
-                        url.searchParams.set('view', m.cid);
-                        //location.replace(url)
-                        window.history.pushState({}, '', url);
-                    }
-                } // REVIEW: single collections have special behavior: autoreload -f
+            if (!found && models.length > 0) {
+                let m = Repo.getModel(models[0].model.schema)
+                this.setModel(m)
+                this.pushUrlState(m, params)
             }
-            this.setModel(currentSchema)
             return models
         })
+    }
+
+    pushUrlState(m, params) {
+        console.log({m, params}, 'pushState')
+        return // FIXME consider re-implementing
+        const url = new URL(window.location);
+        if (!!params.run) {
+            url.searchParams.set('cid', m.source.cid);
+            url.searchParams.set('run', m.cid);
+            //location.replace(url)
+            window.history.pushState({}, '', url);
+        } else if (!!params.view) {
+            url.searchParams.set('cid', m.source.cid);
+            url.searchParams.set('view', m.cid);
+            window.history.pushState({}, '', url);
+        }
+    }
+
+    onImport(m, params) {
+        if (m.source.cid !== params.cid) {
+            return
+        }
+        if (m.cid === params.view || m.cid === params.run) {
+            this.pushUrlState(m, params)
+            this.setModel(m.schema)
+            return true
+        }
     }
 
     readModels() {
@@ -99,16 +108,17 @@ export default class IndexPage extends Component {
 
     getParams() {
         const params = new URLSearchParams(location.search);
+        const cid = params.get("cid");
         const run = params.get("run");
         const view = params.get("view");
         const stateVal = params.get("state");
         const help = params.get("help");
-        let state = []
+        let state = [];
 
         if (stateVal) {
             state = JSON.parse(stateVal)
         }
-        return { run, view, state, help }
+        return { cid, run, view, state, help }
     }
 
     render() {

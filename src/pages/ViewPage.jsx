@@ -11,13 +11,13 @@ export default function ViewPage(props) {
     if (!props.metaModel) {
         return <React.Fragment/>
     }
-    let urlParams = ""
+    let viewImage = ""
     const m = props.metaModel.model()
     if (m && m.cid) {
         if (props.state) {
-            urlParams = "../"+m.cid + "/image.svg?state=[" + props.state.join(',') + "]"
+            viewImage = m.image+"?state=[" + props.state.join(',') + "]"
         } else {
-            urlParams = "../"+m.cid+"/image.svg"
+            viewImage = m.image
         }
     }
 
@@ -27,8 +27,8 @@ export default function ViewPage(props) {
         </Container>
         <Card >
             <CardMedia>
-                <a href={"?run="+m.cid}>
-                    <img src={urlParams} />
+                <a href={"?cid="+m.source.cid+"&run="+m.cid}>
+                    <img src={viewImage} />
                 </a>
             </CardMedia>
         </Card>

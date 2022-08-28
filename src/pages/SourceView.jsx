@@ -44,26 +44,16 @@ export default function SourceView(props) {
         return <React.Fragment/>
     }
 
-    let urlParams = ""
     const m = props.metaModel.model()
     if (!m) {
         return <React.Fragment/>
-    }
-    if (m && m.cid) {
-        if (props.state) {
-            urlParams = "../"+m.cid + "/image.svg?state=[" + props.state.join(',') + "]"
-        } else {
-            urlParams = "../"+m.cid+"/image.svg"
-        }
     }
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-    const [code, setCode] = React.useState(
-        m.source
-    );
+    const [code, setCode] = React.useState(m.source.code);
 
     return <React.Fragment>
         <Box sx={{ width: '100%' }}>
@@ -74,7 +64,7 @@ export default function SourceView(props) {
                 </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
-                <ReactMarkdown>{m.markdown}</ReactMarkdown>
+                <ReactMarkdown>{m.source.markdown}</ReactMarkdown>
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <CodeEditor

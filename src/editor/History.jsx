@@ -3,10 +3,8 @@ import PropTypes from "prop-types";
 import {FormGroup, Grid, TextField} from "@mui/material";
 
 export default function History(props) {
-
     const history = props.metaModel.simulation.history;
     const entries = []
-    console.log({history})
 
     for (const i in history) {
         const val = history[i]

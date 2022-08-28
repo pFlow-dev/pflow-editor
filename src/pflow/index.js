@@ -11,27 +11,27 @@ export const Repo = new class {
 
     constructor() {
         this.models = new Map()
-        this.config = new Map()
     }
 
-    import(schema, modelDef, config) {
-        this.models[schema] = modelDef;
-        this.config[schema] = config;
-        // KLUDGE: should refactor models.json instead
-        this.models[schema]['source'] = config['source'];
-        this.models[schema]['markdown'] = config['markdown'];
+    import(row) {
+        this.models[row.model.schema] = {
+            source: row.source,
+            image: "../" + row.source.cid + "/" + row.model.cid + "/image.svg",
+            ...row.model
+        }
+        return this.models[row.model.schema]
     }
 
     listModels() {
         const out = []
         for (const m in this.models) {
-            out.push(this.models[m])
+            out.push(this.getModel(m))
         }
         return out;
     }
 
     getModel(schema) {
-        return this.models[schema];
+        return this.models[schema]
     }
 
     getDeclaration(schema) {
