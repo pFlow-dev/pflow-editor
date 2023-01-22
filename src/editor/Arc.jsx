@@ -16,9 +16,9 @@ export default function Arc(props) {
   if (weight === 0) {
     subtype = 'Inhibitor';
     if (target.role) {
-      weight = 0-target.guards[source.label].delta[source.offset];
-    } else {
-      console.error("invalid inhibitor")
+      if (target.guards.hasOwnProperty(source.label)) {
+        weight = 0-target.guards[source.label].delta[source.offset];
+      }
     }
   }
 
