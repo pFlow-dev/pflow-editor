@@ -17,6 +17,7 @@ module.exports = {
     'react',
   ],
   'rules': {
+    'semi': 2,
   },
   'settings': {
     'react': {

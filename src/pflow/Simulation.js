@@ -75,7 +75,7 @@ class Simulation {
   fire(oid, multiple, callback) {
     const [out, ok] = this.canFire(oid, multiple);
     if (ok) {
-      this.history.push({ action: oid, multiple, seq: this.history.length+1, state: out })
+      this.history.push({ action: oid, multiple, seq: this.history.length+1, state: out });
       this.state = out;
       if (callback) {
         callback();

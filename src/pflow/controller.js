@@ -1,8 +1,8 @@
 import {Repo} from "./index";
 
 function pushUrlState(m, params) {
-    console.log({m, params}, 'pushState')
-    return // FIXME consider re-implementing
+    console.log({m, params}, 'pushState');
+    return; // FIXME consider re-implementing
     const url = new URL(window.location);
     if (!!params.run) {
         url.searchParams.set('cid', m.source.cid);
@@ -18,12 +18,12 @@ function pushUrlState(m, params) {
 
 function onImport(m, params, callback) {
     if (m.source.cid !== params.cid) {
-        return
+        return;
     }
     if (m.cid === params.view || m.cid === params.run) {
-        pushUrlState(m, params)
-        callback(m.schema)
-        return true
+        pushUrlState(m, params);
+        callback(m.schema);
+        return true;
     }
 }
 
@@ -38,44 +38,44 @@ export function getParams() {
     let state = [];
 
     if (stateVal) {
-        state = JSON.parse(stateVal)
+        state = JSON.parse(stateVal);
     }
-    return {cid, run, view, state, help, tutorial}
+    return {cid, run, view, state, help, tutorial};
 }
 
 export function loadModelFromResponse(response, callback) {
     const reader = response.body.getReader();
     return reader.read().then((res) => {
-        let decoder = new TextDecoder()
-        let source = decoder.decode(res.value)
-        let models = JSON.parse(source)
-        let params = getParams()
-        let found = false
+        let decoder = new TextDecoder();
+        let source = decoder.decode(res.value);
+        let models = JSON.parse(source);
+        let params = getParams();
+        let found = false;
         for (let m of models) {
             if (onImport(Repo.import(m), params, callback)) {
-                found = true
+                found = true;
             }
         }
         if (!found && models.length > 0) {
-            let m = Repo.getModel(models[0].model.schema)
-            callback(m)
-            pushUrlState(m, params)
+            let m = Repo.getModel(models[0].model.schema);
+            callback(m);
+            pushUrlState(m, params);
         }
-        return models
-    })
+        return models;
+    });
 }
 
 async function pollModels(setModel) {
-    let source = new EventSource("/sse?stream=models", {withCredentials: true})
-    let last = ""
+    let source = new EventSource("/sse?stream=models", {withCredentials: true});
+    let last = "";
     source.addEventListener("message", (evt) => {
-        let e = JSON.parse(evt.data)
+        let e = JSON.parse(evt.data);
         if (last != e.cid) {
-            console.log({e}, 'modified')
-            last = e.cid
-            readModels(setModel)
+            console.log({e}, 'modified');
+            last = e.cid;
+            readModels(setModel);
         } else {
-            console.log({e}, 'nochange')
+            console.log({e}, 'nochange');
         }
-    })
+    });
 }

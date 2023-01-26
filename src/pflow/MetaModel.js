@@ -61,7 +61,7 @@ class MetaModel {
 
   onObjSelect(obj, callback) {
     if (this.mode === 'simulation') {
-      return
+      return;
     }
     this.currentSelection = obj;
     const oid = obj.target;
@@ -92,7 +92,7 @@ class MetaModel {
 
   getState() {
     if (this.isRunning()) {
-      return this.simulation.state
+      return this.simulation.state;
     }
   }
 
