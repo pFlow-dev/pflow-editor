@@ -64,6 +64,6 @@ class Model extends Component {
 Model.propTypes = {
   schema: PropTypes.string,
   metaModel: PropTypes.object,
-}
+};
 
 export default Model;

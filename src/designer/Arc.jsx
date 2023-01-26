@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
 /**
  * Arcs connect places and transition
@@ -116,4 +116,4 @@ Arc.propTypes = {
   inhibitor: PropTypes.bool,
   id: PropTypes.string,
   metaModel: PropTypes.object
-}
+};

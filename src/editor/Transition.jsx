@@ -19,9 +19,9 @@ export default function Transition(props) {
     // construct a new label and avoid collision with existing objects
     function newLabel() {
       if  (!props.metaModel.getObj(evt.target.value)) {
-        return  evt.target.value
+        return  evt.target.value;
       }
-      return false
+      return false;
     }
 
     switch (evt.target.id) {
@@ -30,14 +30,14 @@ export default function Transition(props) {
         break;
       }
       case ('label'): {
-        let newIndex = newLabel()
+        let newIndex = newLabel();
         if (newIndex !== false) { // REVIEW: this keeps app from crashing but is inelegant
           props.metaModel.transitions[newIndex] = props.metaModel.transitions[transition.label];
           delete props.metaModel.transitions[transition.label];
           props.metaModel.transitions[newIndex].label = newIndex;
           props.metaModel.currentSelection.target = newIndex;
         } else {
-          console.warn(`name collision: ${evt.target.value}`)
+          console.warn(`name collision: ${evt.target.value}`);
         }
         break;
       }
@@ -57,8 +57,8 @@ export default function Transition(props) {
     return true;
   }
 
-  const marginTop = "5px"
-  const width = "5em"
+  const marginTop = "5px";
+  const width = "5em";
 
   return <React.Fragment>
     <form noValidate autoComplete="off">
@@ -75,4 +75,4 @@ export default function Transition(props) {
 Transition.propTypes = {
   selectedObj: PropTypes.object,
   metaModel: PropTypes.object
-}
+};

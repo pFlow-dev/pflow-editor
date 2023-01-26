@@ -9,15 +9,15 @@ import SourceView from "./SourceView";
 
 export default function ViewPage(props) {
     if (!props.metaModel) {
-        return <React.Fragment/>
+        return <React.Fragment/>;
     }
-    let viewImage = ""
-    const m = props.metaModel.model()
+    let viewImage = "";
+    const m = props.metaModel.model();
     if (m && m.cid) {
         if (props.state) {
-            viewImage = m.image+"?state=[" + props.state.join(',') + "]"
+            viewImage = m.image+"?state=[" + props.state.join(',') + "]";
         } else {
-            viewImage = m.image
+            viewImage = m.image;
         }
     }
 
@@ -39,4 +39,4 @@ export default function ViewPage(props) {
 ViewPage.propTypes = {
     metaModel: PropTypes.object,
     state: PropTypes.array
-}
+};

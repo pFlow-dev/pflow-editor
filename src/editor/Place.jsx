@@ -14,16 +14,16 @@ export default function Place(props) {
     // construct a new label and avoid collision with existing objects
     function newLabel() {
       if  (!props.metaModel.getObj(evt.target.value)) {
-        return  evt.target.value
+        return  evt.target.value;
       }
-      return false
+      return false;
     }
     switch (evt.target.id) {
       case ('label'): {
-        let newIndex = newLabel()
+        let newIndex = newLabel();
         if (newIndex !== false) { // REVIEW: this keeps app from crashing but is inelegant
           for (const txn in props.metaModel.transitions) {
-            let guards = props.metaModel.transitions[txn].guards
+            let guards = props.metaModel.transitions[txn].guards;
             if (place.label in guards) {
               props.metaModel.transitions[txn].guards[newIndex] = {
                 label: newIndex,
@@ -37,7 +37,7 @@ export default function Place(props) {
           props.metaModel.places[newIndex].label = newIndex;
           props.metaModel.currentSelection.target = newIndex;
         } else {
-          console.warn(`name collision: ${evt.target.value}`)
+          console.warn(`name collision: ${evt.target.value}`);
         }
         break;
       }
@@ -65,8 +65,8 @@ export default function Place(props) {
   }
 
   const place = props.metaModel.getObj(props.selectedObj.target);
-  const marginTop = "5px"
-  const width = "9.5em"
+  const marginTop = "5px";
+  const width = "9.5em";
 
   return <React.Fragment>
     <form noValidate autoComplete="off">
@@ -84,4 +84,4 @@ export default function Place(props) {
 Place.propTypes = {
   selectedObj: PropTypes.object,
   metaModel: PropTypes.object,
-}
+};

@@ -14,7 +14,7 @@ import CameraIcon from "@mui/icons-material/Camera";
 const colors = {
   primary: "primary",
   default: "default"
-}
+};
 
 export default class DesignToolbar extends Component {
   constructor(props) {
@@ -36,9 +36,9 @@ export default class DesignToolbar extends Component {
 
   getColor(mode) {
     if (mode === this.props.metaModel.mode) {
-      return colors.primary
+      return colors.primary;
     } else {
-      return colors.default
+      return colors.default;
     }
   }
 
@@ -47,16 +47,16 @@ export default class DesignToolbar extends Component {
       return (<React.Fragment/>);
     }
 
-    let imageUrl = "#"
-    const state = this.props.metaModel.getState()
-    const m = this.props.metaModel.model()
+    let imageUrl = "#";
+    const state = this.props.metaModel.getState();
+    const m = this.props.metaModel.model();
     if (! m) {
       return (<React.Fragment/>);
     }
     if (state) {
-      imageUrl = m.image+"?state=["+state.join(',')+"]"
+      imageUrl = m.image+"?state=["+state.join(',')+"]";
     } else {
-      imageUrl = m.image
+      imageUrl = m.image;
     }
 
 
@@ -68,7 +68,7 @@ export default class DesignToolbar extends Component {
               <StopCircleOutlined />
             </IconButton>
           </a>
-        </Tooltip>
+        </Tooltip>;
       } else {
         return <Tooltip title="Run">
           <a>
@@ -76,9 +76,9 @@ export default class DesignToolbar extends Component {
               <PlayCircleOutlined />
             </IconButton>
           </a>
-        </Tooltip>
+        </Tooltip>;
       }
-    }
+    };
 
     return <React.Fragment>
       <Grid container justifyContent="center">
@@ -146,4 +146,4 @@ export default class DesignToolbar extends Component {
 
 DesignToolbar.propTypes = {
   metaModel: PropTypes.object
-}
+};

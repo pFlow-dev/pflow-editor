@@ -1,6 +1,6 @@
 import React from 'react';
 import Designer from '../designer/Designer';
-import '../App.css'
+import '../App.css';
 import Editor from "../editor/Editor";
 import PropTypes from "prop-types";
 import {Container, Paper} from "@mui/material";
@@ -9,7 +9,7 @@ import TitleLink from "./TitleLink";
 
 export default function RunPage(props) {
     if (! props.metaModel) {
-        return <React.Fragment />
+        return <React.Fragment />;
     }
 
     return <React.Fragment>
@@ -21,10 +21,10 @@ export default function RunPage(props) {
             <DesignToolbar metaModel={props.metaModel} />
         </Paper>
         <Editor metaModel={props.metaModel} />
-    </React.Fragment>
+    </React.Fragment>;
 }
 
 RunPage.propTypes = {
     metaModel: PropTypes.object,
     state: PropTypes.array,
-}
+};

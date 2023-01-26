@@ -92,4 +92,4 @@ export default function SupportPage(props) {
 }
 
 SupportPage.propTypes = {
-}
+};

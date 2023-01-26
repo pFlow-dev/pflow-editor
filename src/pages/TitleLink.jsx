@@ -15,9 +15,9 @@ export default function TitleLink(props) {
                 {props.title}
             </a>
         </Tooltip>
-    </React.Fragment>
+    </React.Fragment>;
 }
 
 TitleLink.propTypes = {
     title: PropTypes.string
-}
+};

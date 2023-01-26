@@ -21,4 +21,4 @@ export default function CollectionPage(props) {
 
 CollectionPage.propTypes = {
     metaModel: PropTypes.object
-}
+};

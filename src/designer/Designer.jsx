@@ -16,7 +16,7 @@ export default function Designer(props) {
  const [svgWidth, setSvgWidth] = React.useState(window.screen.width);
 
  window.addEventListener('orientationchange',(evt) => {
-     setSvgWidth(window.screen.width)
+     setSvgWidth(window.screen.width);
  });
 
   return <React.Fragment>
@@ -38,9 +38,9 @@ export default function Designer(props) {
             </defs>
             <Model metaModel={props.metaModel} />
           </svg>
-  </React.Fragment>
+  </React.Fragment>;
 }
 
 Designer.propTypes = {
     metaModel: PropTypes.object
-}
+};

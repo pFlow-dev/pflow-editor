@@ -1,5 +1,5 @@
 import React from 'react';
-import {Component} from 'react'
+import {Component} from 'react';
 import {Repo} from "../pflow";
 import NewMetaModel from "../pflow/MetaModel";
 import RunPage from "../pages/RunPage";
@@ -15,8 +15,8 @@ export default class IndexPage extends Component {
 
         // refactor to use hooks?
         this.componentDidMount = () => {
-            Repo.loadModels(this.setModel.bind(this))//.then(this.pollModels)
-        }
+            Repo.loadModels(this.setModel.bind(this));//.then(this.pollModels)
+        };
     }
 
     setModel(selected) {
@@ -26,26 +26,26 @@ export default class IndexPage extends Component {
             setModel: (schema) => this.setModel(schema),
             onUpdate: () => {
                 //setTimeout(writeLocalStorage, 5)
-                this.setState({selected})
+                this.setState({selected});
             }
-        })
-        this.setState({selected})
+        });
+        this.setState({selected});
     }
 
 
     render() {
-        const { run, view, state, help } = getParams()
+        const { run, view, state, help } = getParams();
         if (view) {
-            return <ViewPage state={state} metaModel={this.metaModel}/>
+            return <ViewPage state={state} metaModel={this.metaModel}/>;
         } else if (run) {
-            return <RunPage state={state} metaModel={this.metaModel} />
+            return <RunPage state={state} metaModel={this.metaModel} />;
         } else if (help) {
-            return <SupportPage/>
+            return <SupportPage/>;
         } else {
-            return <CollectionPage metaModel={this.metaModel}/>
+            return <CollectionPage metaModel={this.metaModel}/>;
         }
     }
 }
 
 IndexPage.propTypes = {
-}
+};

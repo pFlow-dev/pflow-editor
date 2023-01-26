@@ -10,9 +10,9 @@ import {Link} from "@mui/material";
 
 export default function ModelList() {
 
-    const models = Repo.listModels()
+    const models = Repo.listModels();
     if (models.length == 0) {
-        return <React.Fragment/>
+        return <React.Fragment/>;
     }
 
     return (

@@ -9,8 +9,8 @@ import SourceView from "../pages/SourceView";
 
 export default function Editor(props) {
   const selectedObj = props.metaModel.getCurrentObj();
-  const marginTop = '1em'
-  const marginLeft = '1em'
+  const marginTop = '1em';
+  const marginLeft = '1em';
 
   switch (selectedObj.type) {
     case 'Place': {
@@ -53,4 +53,4 @@ export default function Editor(props) {
 
 Editor.propTypes = {
   metaModel: PropTypes.object
-}
+};
