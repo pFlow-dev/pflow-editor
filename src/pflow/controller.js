@@ -1,27 +1,10 @@
 import {Repo} from "./index";
 
-function pushUrlState(m, params) {
-    console.log({m, params}, 'pushState');
-    return; // FIXME consider re-implementing
-    const url = new URL(window.location);
-    if (!!params.run) {
-        url.searchParams.set('cid', m.source.cid);
-        url.searchParams.set('run', m.cid);
-        //location.replace(url)
-        window.history.pushState({}, '', url);
-    } else if (!!params.view) {
-        url.searchParams.set('cid', m.source.cid);
-        url.searchParams.set('view', m.cid);
-        window.history.pushState({}, '', url);
-    }
-}
-
 function onImport(m, params, callback) {
     if (m.source.cid !== params.cid) {
         return;
     }
     if (m.cid === params.view || m.cid === params.run) {
-        pushUrlState(m, params);
         callback(m.schema);
         return true;
     }
@@ -43,11 +26,18 @@ export function getParams() {
     return {cid, run, view, state, help, tutorial};
 }
 
+
 export function loadModelFromResponse(response, callback) {
     const reader = response.body.getReader();
-    return reader.read().then((res) => {
+    return reader.read().then(async (res) => {
         let decoder = new TextDecoder();
         let source = decoder.decode(res.value);
+        let done = res.done;
+        while (!done) {
+            const next = await reader.read();
+            source += decoder.decode(next.value);
+            done = next.done;
+        }
         let models = JSON.parse(source);
         let params = getParams();
         let found = false;
@@ -59,13 +49,12 @@ export function loadModelFromResponse(response, callback) {
         if (!found && models.length > 0) {
             let m = Repo.getModel(models[0].model.schema);
             callback(m);
-            pushUrlState(m, params);
         }
         return models;
     });
 }
-
 async function pollModels(setModel) {
+    // REVIEW: consider making polling configureable from the model json
     let source = new EventSource("/sse?stream=models", {withCredentials: true});
     let last = "";
     source.addEventListener("message", (evt) => {
