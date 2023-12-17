@@ -10,6 +10,7 @@ interface NodeState {
     dragging: boolean;
 }
 
+// TODO: turn this into a tools for loading/creating subnets
 export default function TxSubnet(props: TxSubnetProps) {
     const {metaModel} = props;
 

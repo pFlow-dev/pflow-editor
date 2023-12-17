@@ -3,13 +3,15 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import {MetaModel} from "../pflow";
-import {Redo, Undo, History, AutoGraph} from "@mui/icons-material";
+import {ClearAll} from "@mui/icons-material";
 
+// TODO: support history, undo, redo, force layout
 
 type CollectionProps = {
     metaModel: MetaModel;
 }
 export default function EditMenu(props: CollectionProps) {
+    const { metaModel } = props;
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -17,6 +19,11 @@ export default function EditMenu(props: CollectionProps) {
     };
     const handleClose = () => {
         setAnchorEl(null);
+    };
+    const handleClear = () => {
+        metaModel.menuAction("select");
+        metaModel.clearAll();
+        handleClose();
     };
 
     return (
@@ -40,10 +47,7 @@ export default function EditMenu(props: CollectionProps) {
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                <MenuItem onClick={handleClose}><Undo/>&nbsp;Undo</MenuItem>
-                <MenuItem onClick={handleClose}><Redo/>&nbsp;Redo</MenuItem>
-                <MenuItem onClick={handleClose}><History/>&nbsp;Select Revision</MenuItem>
-                <MenuItem onClick={handleClose}><AutoGraph/>&nbsp;Force-Atlas Layout</MenuItem>
+                <MenuItem onClick={handleClear}><ClearAll/>&nbsp;Clear All</MenuItem>
             </Menu>
         </div>
     );

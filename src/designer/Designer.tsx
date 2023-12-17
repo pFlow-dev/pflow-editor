@@ -26,12 +26,10 @@ export default function Designer(props: DesignerProps): React.ReactElement {
         setSvgWidth(window.innerWidth);
     });
 
-    console.log('svgWidth', svgWidth)
     return <React.Fragment>
         <svg id="pflow-svg-outer"
              width={svgWidth}
              height={metaModel.height}
-             onContextMenu={(evt) => evt.preventDefault()}
              onClick={onClick}>
 
             <foreignObject id="snapshotCanvas" x={0} y={0} width={"100%"} height={metaModel.height}>
@@ -59,7 +57,7 @@ export default function Designer(props: DesignerProps): React.ReactElement {
             </svg>
 
 
-            <foreignObject id="pflow-logo" x={20} y={0} width={140} height={45}>
+            <foreignObject id="pflow-logo" x={20} y={2} width={140} height={45}>
                 <a href={"./"}>
                     <svg width="200" height="45">
                         <path
@@ -69,17 +67,20 @@ export default function Designer(props: DesignerProps): React.ReactElement {
                     </svg>
                 </a>
             </foreignObject>
-            <foreignObject id="filemenu-foreign" x={130} y={9} width={"200px"} height="40px">
+            <foreignObject id="filemenu-foreign" x={160} y={9} width={"200px"} height="40px">
                 <FileMenu metaModel={metaModel}/>
             </foreignObject>
-            <foreignObject id="editmenu-foreign" x={190} y={9} width={"200px"} height="40px">
+            <foreignObject id="editmenu-foreign" x={220} y={9} width={"200px"} height="40px">
                 <EditMenu metaModel={metaModel}/>
             </foreignObject>
-            <foreignObject id="editmenu-foreign" x={250} y={9} width={"200px"} height="40px">
+            <foreignObject id="editmenu-foreign" x={280} y={9} width={"200px"} height="40px">
                 <HelpMenu metaModel={metaModel}/>
             </foreignObject>
-            <foreignObject id="pflow-foreign" x={svgWidth - 80} y={5} width={"100%"} height="40px">
-                <ProfileMenu/>
+            <foreignObject id="pflow-foreign" x={svgWidth - 133} y={12} width={"100%"} height="40px">
+                <iframe
+                    src="https://ghbtns.com/github-btn.html?user=pFlow-dev&repo=pflow-editor&type=star&count=true&size=large"
+                    frameBorder="0" scrolling="0" width="130" height="40" title="GitHub">
+                </iframe>
             </foreignObject>
         </svg>
     </React.Fragment>

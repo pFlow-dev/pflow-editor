@@ -5,7 +5,7 @@ export function pos(x: number, y: number): { x: number, y: number } {
     return {x: x * 80, y: y * 80}
 }
 
-export function defaultDeclaration(fn: Fn, cell: Cell, role: Role): void {
+function fooBarAddSub(fn: Fn, cell: Cell, role: Role): void {
     const defaultRole = role('default');
     const foo = cell('foo', 1, 3, pos(6, 4));
 
@@ -20,3 +20,5 @@ export function defaultDeclaration(fn: Fn, cell: Cell, role: Role): void {
     bar.guard(3, foo);
     foo.guard(1, baz);
 }
+
+export const  defaultDeclaration = () => {} //fooBarAddSub;

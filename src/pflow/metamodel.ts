@@ -3,6 +3,7 @@ import * as mm from "@pflow-dev/metamodel";
 import {defaultDeclaration} from "./model";
 import {Action} from "./types";
 import {hideCanvas, showCanvas, snapshotSvg} from "./snapshot";
+import {loadModelFromPermLink} from "./permalink";
 
 export const keyToAction: Record<string, Action> = Object.freeze({
     '1': 'select',
@@ -35,20 +36,30 @@ export function getModel(): MetaModel {
     return metaModelSingleton;
 }
 
+
 function newStream(m: mm.Model): mm.Stream<Event> {
     const stream = new mm.Stream<Event>({models: [m]});
-    stream.dispatcher.onFail(() => {
+    stream.dispatcher.onFail((s , evt) => {
+        // this should never happen
+        // because we only fire events that are enabled
+        console.error({ s, evt }, 'onFail');
     })
     return stream;
 }
 
+const initialModel = mm.newModel({
+    schema: window.location.hostname,
+    declaration: defaultDeclaration,
+    type: mm.ModelType.petriNet
+});
+
 export class MetaModel {
-    m: mm.Model;
+    m: mm.Model = initialModel;
     height: number = 600;
     selectedObject: mm.MetaObject | null = null;
     selectedId: string | null = null;
     mode: Action = 'select';
-    stream: mm.Stream<Event>;
+    stream: mm.Stream<Event> = newStream(initialModel);
     protected running: boolean = false;
     protected editing: boolean = false;
     protected sourceView: 'full' | 'sparse' = 'sparse';
@@ -56,12 +67,6 @@ export class MetaModel {
     protected onHotkeyUp: (evt: KeyboardEvent) => void
 
     constructor(m?: mm.Model) {
-        this.m = m || mm.newModel({
-            schema: window.location.hostname,
-            declaration: defaultDeclaration,
-            type: mm.ModelType.petriNet
-        });
-        this.stream = newStream(this.m);
         this.onHotkeyDown = (evt) => {
             this.editing || this.onKeyup(evt);
         };
@@ -70,11 +75,32 @@ export class MetaModel {
         };
         window.addEventListener('keyup', this.onHotkeyDown);
         window.addEventListener('keydown', this.onHotkeyUp);
+
+        loadModelFromPermLink().then((urlModel) => {
+            this.m = urlModel;
+            this.stream = newStream(this.m);
+            this.update();
+        }).catch(() => {
+            this.m = m || initialModel;
+            this.stream = newStream(this.m);
+            this.update();
+        });
+    }
+
+
+    loadModel(m: mm.Model): void {
+        this.m = m;
+        this.restartStream(false);
+        this.update();
     }
 
     loadJson(json: string): boolean {
         try {
             const data = JSON.parse(json) as mm.ModelDeclaration;
+            if (data.version !== 'v0') {
+                console.warn("model version mismatch, expected: v0 got: " + data.version);
+                data.version = 'v0';
+            }
             this.m = mm.newModel({
                 schema: window.location.hostname,
                 declaration: data,
@@ -86,6 +112,16 @@ export class MetaModel {
         }
         return true;
     }
+
+    clearAll(): void {
+        this.m = mm.newModel({
+            schema: window.location.hostname,
+            declaration: defaultDeclaration,
+            type: mm.ModelType.petriNet
+        });
+        this.restartStream(false);
+        this.update();
+    };
 
     stats() {
         const {places, transitions, arcs} = this.m.def;
@@ -199,6 +235,9 @@ export class MetaModel {
         }
         const all = this.allSelectableObjects()
         let next = all[0];
+        if (!next) {
+            return;
+        }
         if (this.selectedObject) {
             const index = all.indexOf(this.selectedObject);
             next = all[index + 1] || all[0];
@@ -306,6 +345,7 @@ export class MetaModel {
                 }
             }
             if (isExecute) {
+                this.unsetCurrentObj();
                 this.restartStream(true);
             }
             if (wasExecute) {
@@ -509,6 +549,8 @@ export class MetaModel {
         if (this.isRunning()) {
             if (this.stream.dispatch({schema: this.m.def.schema, action: id, multiple: 1}).ok) {
                 return this.update();
+            } else {
+                return;
             }
         }
         if (this.mode === 'delete') {
@@ -585,6 +627,23 @@ export class MetaModel {
         }
         this.unsetCurrentObj();
         return this.update();
+    }
+
+    uploadFile(file: File): Promise<void> {
+        const reader = new FileReader();
+        return new Promise((resolve, reject) => {
+            reader.onload = (e) => {
+                if (e.target) {
+                    const content = e.target.result
+                    if (content && this.loadJson(content.toString())) {
+                        resolve();
+                        return;
+                    }
+                }
+                reject();
+            };
+            reader.readAsText(file);
+        });
     }
 
     protected updateHook: () => void = () => {

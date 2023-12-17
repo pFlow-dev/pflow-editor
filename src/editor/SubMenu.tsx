@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import {IconButton, Tooltip} from "@mui/material";
 import {MetaModel} from "../pflow";
-import {Download, Image, Link, Share, UploadFile} from "@mui/icons-material";
+import {Download, Image, Link, UploadFile} from "@mui/icons-material";
 import {downloadPngFromCanvas} from "../pflow/snapshot";
-import JSZip from "jszip";
 import {FileUploader} from "react-drag-drop-files";
+import {zip} from "../pflow/permalink";
+import {downloadModelJson} from "../pflow/export";
 
 interface SubMenuProps {
     metaModel: MetaModel;
@@ -13,30 +14,11 @@ interface SubMenuProps {
 export default function SubMenu(props: SubMenuProps) {
     const metaModel = props.metaModel;
 
-    const [, setFile] = useState(new File([], ""));
     const handleFile = (file: File) => {
-        // read file content
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if (e.target) {
-                const content = e.target.result
-                if (content && metaModel.loadJson(content.toString())) {
-                    metaModel.update()
-                }
-            }
-        };
-        reader.readAsText(file);
-        setFile(file);
+        metaModel.uploadFile(file).then(() => {
+            metaModel.update();
+        })
     };
-
-    function createDownloadLink() {
-        const element = document.createElement("a");
-        const file = new Blob([metaModel.toJson()], {type: "text/plain"});
-        element.href = URL.createObjectURL(file);
-        element.download = "model.json";
-        document.body.appendChild(element); // Required for this to work in FireFox
-        element.click();
-    }
 
     function createPngLink() {
         if (metaModel.mode !== "snapshot") {
@@ -45,33 +27,29 @@ export default function SubMenu(props: SubMenuProps) {
         downloadPngFromCanvas()
     }
 
-    function newShareLink() {
-        const zip = new JSZip();
-        zip.file("model.json", metaModel.toJson());
-        zip.generateAsync({type: "base64"}).then((base64) => {
-            fetch("/share.json?z=" + base64).then((response) => {
-                response.blob().then((blob) => {
-                    blob.text().then((text) => {
-                        if (text.startsWith("{")) {
-                            // TODO: add a dialog to show the link
-                            console.log(JSON.parse(text))
-                        }
-                    })
-                });
-            });
-        });
-    }
+    const [state, setState] = useState({updating: false});
 
-    function updatePermalink() {
+    async function updatePermalink() {
+        if (state.updating) {
+            return;
+        }
+        else {
+            setState({updating: true});
+            setTimeout(async () => {
+                await updatePermalinkData();
+                setState({updating: false});
+            }, 500);
+        }
+    }
+    async function updatePermalinkData() {
         const permalink = document.getElementById("permalink");
         if (permalink) {
-            const zip = new JSZip();
-            zip.file("model.json", metaModel.toJson());
-            zip.generateAsync({type: "base64"}).then((base64) => {
+            return zip(metaModel.toJson()).then((base64) => {
                 const uri = "?z=" + base64
                 permalink.setAttribute("href", uri);
-            });
+            })
         }
+        return Promise.resolve();
     }
 
     metaModel.onUpdate(updatePermalink)
@@ -79,21 +57,23 @@ export default function SubMenu(props: SubMenuProps) {
 
     const color = "#3143a9";
     return <React.Fragment>
-        <FileUploader sx={{color}} handleChange={handleFile} name="model upload" types={["JSON"]}>
-            <Tooltip title="upload.json">
+        <FileUploader sx={{color}} handleChange={handleFile} types={["JSON"]}>
+            <Tooltip title="import json">
                 <IconButton sx={{color}} aria-label="upload json">
                     <UploadFile/>
                 </IconButton>
             </Tooltip>
         </FileUploader>
-        <Tooltip title="model.json">
-            <IconButton sx={{color}} aria-label="download json" onClick={() => createDownloadLink()}>
-                <Download/>
+        <Tooltip title="export json">
+            <IconButton sx={{color}} aria-label="download json" onClick={
+                () => downloadModelJson(metaModel.toJson())
+            }><Download/>
             </IconButton>
         </Tooltip>
-        <Tooltip title="snapshot.png">
-            <IconButton sx={{color}} aria-label="snapshot" color="secondary" onClick={() => createPngLink()}>
-                <Image/>
+        <Tooltip title="snapshot png">
+            <IconButton sx={{color}} aria-label="snapshot" color="secondary" onClick={
+                () => createPngLink()
+            }><Image/>
             </IconButton>
         </Tooltip>
         <Tooltip title="permalink">
@@ -102,11 +82,6 @@ export default function SubMenu(props: SubMenuProps) {
                     <Link/>
                 </IconButton>
             </a>
-        </Tooltip>
-        <Tooltip title="share">
-            <IconButton sx={{color}} aria-label="share" color="secondary" onClick={() => newShareLink()}>
-                <Share/>
-            </IconButton>
         </Tooltip>
     </React.Fragment>;
 }

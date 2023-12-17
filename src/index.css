@@ -8,6 +8,22 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+iframe {
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#pflow-logo text {
+    font-size: 16px;
+}
+
+#github-issue-link {
+    text-decoration: none;
+}
+
 svg text {
     cursor: default;
     -webkit-user-select: none;

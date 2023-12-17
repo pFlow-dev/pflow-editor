@@ -105,8 +105,9 @@ export default function DesignToolbar(props: DesignToolbarProps) {
                 </IconButton>
             </Tooltip>
             <Tooltip title="9. resize">
-                <IconButton sx={{color: unselectedColor}} aria-label="resize">
-                    <DragHandle onClick={() => menuAction("resize")} href=""/>
+                <IconButton sx={{color: unselectedColor}} aria-label="resize"
+                    onClick={() => menuAction("resize")} href="">
+                    <DragHandle/>
                 </IconButton>
             </Tooltip>
         </Grid>
