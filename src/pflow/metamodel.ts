@@ -468,7 +468,6 @@ export class MetaModel {
         }
         this.m.def.arcs.splice(arc.offset, 1);
         this.m.def.arcs.forEach((a, i) => a.offset = i);
-        // this.m.indexArcs();
     }
 
     placeClick(id: string): void {

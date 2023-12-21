@@ -25,30 +25,30 @@ export default function Place(props: PlaceProps) {
                 break;
             }
             case ('initial'): {
-                const x = parseInt(value);
-                if (x >= 0) {
-                    place.initial = x;
+                const initial = parseInt(value);
+                if (initial >= 0) {
+                    place.initial = initial;
                 }
                 break;
             }
             case ('capacity'): {
-                const x = parseInt(value);
-                if (x >= 0) {
-                    place.capacity = x;
+                const capacity = parseInt(value);
+                if (capacity >= 0) {
+                    place.capacity = capacity;
                 }
                 break;
             }
             case ('x'): {
                 const x = parseInt(value);
                 if (x >= 0) {
-                    place.x = x;
+                    place.position.x = x;
                 }
                 break;
             }
             case ('y'): {
                 const y = parseInt(value);
                 if (y >= 0) {
-                    place.y = y;
+                    place.position.y = y;
                 }
                 break;
             }
