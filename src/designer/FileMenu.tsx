@@ -26,6 +26,7 @@ export default function FileMenu(props: CollectionProps) {
     };
     const handleFile = (file: File) => {
         metaModel.uploadFile(file).then(() => {
+            metaModel.menuAction("select");
             metaModel.update();
         })
         handleClose();

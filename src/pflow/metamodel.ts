@@ -3,7 +3,7 @@ import * as mm from "@pflow-dev/metamodel";
 import {defaultDeclaration} from "./model";
 import {Action} from "./types";
 import {hideCanvas, showCanvas, snapshotSvg} from "./snapshot";
-import {loadModelFromPermLink} from "./permalink";
+import {loadModelFromPermLink, zip} from "./permalink";
 
 export const keyToAction: Record<string, Action> = Object.freeze({
     '1': 'select',
@@ -60,6 +60,7 @@ export class MetaModel {
     selectedId: string | null = null;
     mode: Action = 'select';
     stream: mm.Stream<Event> = newStream(initialModel);
+    zippedJson: string = '';
     protected running: boolean = false;
     protected editing: boolean = false;
     protected sourceView: 'full' | 'sparse' = 'sparse';
@@ -85,13 +86,6 @@ export class MetaModel {
             this.stream = newStream(this.m);
             this.update();
         });
-    }
-
-
-    loadModel(m: mm.Model): void {
-        this.m = m;
-        this.restartStream(false);
-        this.update();
     }
 
     loadJson(json: string): boolean {
@@ -266,7 +260,9 @@ export class MetaModel {
     }
 
     update(): void {
-        this.updateHook();
+        zip(this.toJson())
+            .then((data) => this.zippedJson = data)
+            .then(() => this.updateHook())
     }
 
     editorClick(evt: React.MouseEvent): void {
@@ -324,7 +320,6 @@ export class MetaModel {
                 } else {
                     this.mode = 'execute';
                 }
-                // this.restartStream(false);
                 hideCanvas();
             }
             if (wasExecute) {
