@@ -161,14 +161,16 @@ export class MetaModel {
             case 'Delete':
             case 'Backspace':
             case 'Escape':
-            case 'ArrowLeft':
-            case 'ArrowRight':
-            case 'ArrowUp':
-            case 'ArrowDown':
             case 'Tab':
                 evt.preventDefault();
                 evt.stopPropagation();
                 break;
+            case 'ArrowLeft':
+            case 'ArrowRight':
+            case 'ArrowUp':
+            case 'ArrowDown':
+                this.onArrow(evt.key);
+                this.update();
         }
     }
 
@@ -189,13 +191,6 @@ export class MetaModel {
                     this.unsetCurrentObj();
                     this.update();
                 }
-                break;
-            case 'ArrowLeft':
-            case 'ArrowRight':
-            case 'ArrowUp':
-            case 'ArrowDown':
-                this.onArrow(evt.key);
-                this.update();
                 break;
             case '1': // select
             case '2': // snapshot
