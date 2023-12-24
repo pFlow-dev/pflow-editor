@@ -295,8 +295,17 @@ export class MetaModel {
         this.commits.set(this.revision, data);
         const msg = Date.now() + ": " + params.action;
         this.logs.set(this.revision, msg);
+        this.cullHistory(this.revision+1)
         return this.update();
     }
+
+    cullHistory(fromRevision: number): void {
+        for (let i = fromRevision; i < this.commits.size ; i++) {
+            this.commits.delete(i);
+            this.logs.delete(i);
+        }
+    }
+
     async revert(commit: number): Promise<void> {
         if (commit === this.revision) {
             return;
