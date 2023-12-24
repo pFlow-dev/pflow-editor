@@ -8,6 +8,7 @@ interface TransitionProps {
 
 interface NodeState {
     dragging: boolean;
+    modified?: boolean;
 }
 
 export default function Transition(props: TransitionProps) {
@@ -40,13 +41,16 @@ export default function Transition(props: TransitionProps) {
     }
 
     function endDrag(evt: React.MouseEvent) {
+        if (!metaModel.isRunning() && nodeState.modified) {
+            metaModel.commit({ action: "move transition" });
+        }
         setState({dragging: false});
-        metaModel.commit({ action: "move transition" });
         evt.stopPropagation();
     }
 
     function dragging(evt: React.MouseEvent) {
         if (nodeState.dragging) {
+            setState({dragging: true, modified: true });
             if (['execute', 'delete'].includes(metaModel.mode)) {
                 return;
             }

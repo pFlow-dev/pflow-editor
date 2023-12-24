@@ -286,11 +286,15 @@ export class MetaModel {
     }
 
     async commit(params: { action: string }): Promise<void> {
+        if (this.running) {
+            throw new Error('cannot commit while running');
+        }
         const data = await zip(this.toJson());
         this.revision += 1;
         this.zippedJson = data;
         this.commits.set(this.revision, data);
-        this.logs.set(this.revision, Date.now() + ": " + params.action);
+        const msg = Date.now() + ": " + params.action;
+        this.logs.set(this.revision, msg);
         return this.update();
     }
     async revert(commit: number): Promise<void> {

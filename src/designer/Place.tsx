@@ -7,6 +7,7 @@ interface PlaceProps {
 }
 
 interface NodeState {
+    modified?: boolean;
     dragging: boolean;
 }
 
@@ -57,13 +58,16 @@ export default function Place(props: PlaceProps) {
     }
 
     function endDrag(evt: React.MouseEvent) {
+        if (nodeState.modified) {
+            metaModel.commit({action: "move place"});
+        }
         setState({dragging: false});
-        metaModel.commit({ action: "move place" });
         evt.stopPropagation();
     }
 
     function dragging(evt: React.MouseEvent) {
         if (nodeState.dragging) {
+            setState({dragging: true, modified: true })
 
             if (['execute', 'delete'].includes(metaModel.mode)) {
                 return;
