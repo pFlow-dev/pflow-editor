@@ -58,6 +58,7 @@ export default function Place(props: PlaceProps) {
 
     function endDrag(evt: React.MouseEvent) {
         setState({dragging: false});
+        metaModel.commit({ action: "move place" });
         evt.stopPropagation();
     }
 

@@ -55,7 +55,7 @@ export default function Place(props: PlaceProps) {
             default: {
             }
         }
-        props.metaModel.update();
+        props.metaModel.commit({ action: `place change ${attribute}: ${value}` });
     }
 
     const marginTop = "5px";

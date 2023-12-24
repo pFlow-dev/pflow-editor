@@ -51,7 +51,6 @@ export default function Source(props: SouceViewProps) {
         setValue(newValue);
     };
 
-
     return <React.Fragment>
         <Box sx={{width: "100%"}}>
             <Box sx={{borderBottom: 1, borderColor: "divider"}}>
@@ -63,11 +62,18 @@ export default function Source(props: SouceViewProps) {
             <TabPanel value={value} index={0}>
                 <SubMenu metaModel={metaModel}></SubMenu>
                 <pre>
-                        ModelType: {metaModel.m.def.type}
-                    <br/>
-                    {metaModel.stats()}
-                    <br/>
-                        </pre>
+                    <select value={metaModel.m.def.type} onChange={(e) => {
+                        metaModel.m.def.type = e.target.value as any;
+                        metaModel.commit({ action: `change model type: ${e.target.value}`});
+                    }}>
+                        <option value="petriNet">PetriNet</option>
+                        <option value="workflow">Workflow</option>
+                        <option value="elementary">Elementary</option>
+                    </select>
+                    &nbsp;<button style={{border: "none"}} onClick={() => metaModel.revert(metaModel.revision - 1)}>{"<"}</button>
+                    <button style={{border: "none"}}> rev. {metaModel.revision}</button>
+                    <button style={{border: "none"}} onClick={() => metaModel.revert(metaModel.revision + 1)}>{">"}</button>
+                </pre>
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <SubMenu metaModel={metaModel}></SubMenu>

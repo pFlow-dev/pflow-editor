@@ -20,8 +20,9 @@ export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
     const onBlur = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.endEdit();
 
     function handleTypeChange() {
+        const toggle = !arc.inhibit ? "Inhibitor" : "Arc";
         if (metaModel.m.toggleInhibitor(arc.offset)) {
-            metaModel.update();
+            metaModel.commit({ action: "toggle arc type: "+toggle });
         }
     }
 
@@ -30,7 +31,7 @@ export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
             throw new Error("invalid arc");
         }
         if (metaModel.m.setArcWeight(arc.offset, parseInt(evt.target.value))) {
-            metaModel.update();
+            metaModel.commit({ action: "change arc weight: "+evt.target.value });
         }
     }
 

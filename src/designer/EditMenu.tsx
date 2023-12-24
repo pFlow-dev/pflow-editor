@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import {MetaModel} from "../pflow";
-import {ClearAll} from "@mui/icons-material";
+import {ClearAll, Undo, Redo} from "@mui/icons-material";
 
 // TODO: support history, undo, redo, force layout
 
@@ -26,6 +26,17 @@ export default function EditMenu(props: CollectionProps) {
         handleClose();
     };
 
+    const handleUndo = () => {
+        metaModel.revert(metaModel.revision - 1);
+        metaModel.unsetCurrentObj();
+        handleClose();
+    }
+    const handleRedo = () => {
+        metaModel.revert(metaModel.revision + 1);
+        metaModel.unsetCurrentObj();
+        handleClose();
+    }
+
     return (
         <div>
             <Button
@@ -47,6 +58,8 @@ export default function EditMenu(props: CollectionProps) {
                     'aria-labelledby': 'basic-button',
                 }}
             >
+                <MenuItem onClick={handleUndo}><Undo/>&nbsp;Undo</MenuItem>
+                <MenuItem onClick={handleRedo}><Redo/>&nbsp;Redo</MenuItem>
                 <MenuItem onClick={handleClear}><ClearAll/>&nbsp;Clear All</MenuItem>
             </Menu>
         </div>

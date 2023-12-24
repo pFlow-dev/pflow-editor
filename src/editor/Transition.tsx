@@ -46,7 +46,7 @@ export default function Transition(props: TransitionProps) {
 
             }
         }
-        metaModel.update();
+        metaModel.commit({ action: `transition change ${evt.target.id}: ${evt.target.value}` });
         return true;
     }
 

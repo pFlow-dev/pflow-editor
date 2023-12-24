@@ -41,6 +41,7 @@ export default function Transition(props: TransitionProps) {
 
     function endDrag(evt: React.MouseEvent) {
         setState({dragging: false});
+        metaModel.commit({ action: "move transition" });
         evt.stopPropagation();
     }
 

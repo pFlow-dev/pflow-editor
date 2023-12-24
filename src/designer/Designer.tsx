@@ -1,7 +1,6 @@
 import React from 'react';
 import Model from './Model';
 import {MetaModel} from "../pflow";
-import ProfileMenu from "./ProfileMenu";
 import FileMenu from "./FileMenu";
 import EditMenu from "./EditMenu";
 import HelpMenu from "./HelpMenu";

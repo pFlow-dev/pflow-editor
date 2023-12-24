@@ -3,7 +3,7 @@ import * as mm from "@pflow-dev/metamodel";
 import {defaultDeclaration} from "./model";
 import {Action} from "./types";
 import {hideCanvas, showCanvas, snapshotSvg} from "./snapshot";
-import {loadModelFromPermLink, zip} from "./permalink";
+import {loadModelFromPermLink, unzip, zip} from "./permalink";
 
 export const keyToAction: Record<string, Action> = Object.freeze({
     '1': 'select',
@@ -53,6 +53,8 @@ const initialModel = mm.newModel({
     type: mm.ModelType.petriNet
 });
 
+const noOp = () => {};
+
 export class MetaModel {
     m: mm.Model = initialModel;
     height: number = 600;
@@ -61,11 +63,15 @@ export class MetaModel {
     mode: Action = 'select';
     stream: mm.Stream<Event> = newStream(initialModel);
     zippedJson: string = '';
+    revision: number = 0;
+    commits: Map<number,string> = new Map<number,string>();
+    logs: Map<number,string> = new Map<number,string>();
     protected running: boolean = false;
     protected editing: boolean = false;
     protected sourceView: 'full' | 'sparse' = 'sparse';
     protected onHotkeyDown: (evt: KeyboardEvent) => void
     protected onHotkeyUp: (evt: KeyboardEvent) => void
+    protected updateHook: () => void = noOp;
 
     constructor(m?: mm.Model) {
         this.onHotkeyDown = (evt) => {
@@ -80,11 +86,11 @@ export class MetaModel {
         loadModelFromPermLink().then((urlModel) => {
             this.m = urlModel;
             this.stream = newStream(this.m);
-            this.update();
+            this.commit({action: 'load from permalink'});
         }).catch(() => {
             this.m = m || initialModel;
             this.stream = newStream(this.m);
-            this.update();
+            this.commit({action: 'load initial model'});
         });
     }
 
@@ -102,24 +108,30 @@ export class MetaModel {
             });
             this.restartStream(false);
         } catch (e) {
+            console.error(e)
             return false;
         }
         return true;
     }
 
-    clearAll(): void {
+    clearAll(): Promise<void> {
         this.m = mm.newModel({
             schema: window.location.hostname,
             declaration: defaultDeclaration,
             type: mm.ModelType.petriNet
         });
         this.restartStream(false);
-        this.update();
+        return this.commit({ action: "clear all" });
     };
 
     stats() {
         const {places, transitions, arcs} = this.m.def;
-        return `places: ${places.size} transitions: ${transitions.size} arcs: ${arcs.length}`;
+        return {
+            revision: this.revision,
+            places: places.size,
+            transitions: transitions.size,
+            arcs: arcs.length,
+        }
     }
 
     toJson(): string {
@@ -157,6 +169,20 @@ export class MetaModel {
     }
 
     onKeydown(evt: KeyboardEvent) {
+        if (evt.ctrlKey && evt.key === 'z') {
+            this.unsetCurrentObj();
+            this.revert(this.revision - 1);
+            evt.preventDefault();
+            evt.stopPropagation();
+            return;
+        }
+        if (evt.ctrlKey && evt.key === 'y') {
+            this.unsetCurrentObj();
+            this.revert(this.revision + 1);
+            evt.preventDefault();
+            evt.stopPropagation();
+            return;
+        }
         switch (evt.key) {
             case 'Delete':
             case 'Backspace':
@@ -170,11 +196,11 @@ export class MetaModel {
             case 'ArrowUp':
             case 'ArrowDown':
                 this.onArrow(evt.key);
-                this.update();
+                this.commit({ action: evt.key });
         }
     }
 
-    onKeyup(evt: KeyboardEvent) {
+    async onKeyup(evt: KeyboardEvent) {
         switch (evt.key) {
             case 'Tab':
                 this.onTab();
@@ -189,7 +215,7 @@ export class MetaModel {
                 if (this.selectedObject && this.selectedObject.metaType !== 'arc') {
                     this.deleteObject(this.selectedObject.label);
                     this.unsetCurrentObj();
-                    this.update();
+                    this.commit({ action: `delete ${this.selectedId}` });
                 }
                 break;
             case '1': // select
@@ -211,32 +237,33 @@ export class MetaModel {
             case 'd': // delete
             case '?': // help
                 this.menuAction(keyToAction[evt.key]);
-                this.update();
+                await this.update();
                 break;
         }
         evt.preventDefault();
         evt.stopPropagation();
     }
 
-    onTab() {
+    onTab() : Promise<void> {
         if (this.running) {
-            return;
+            return Promise.resolve();
         }
         const all = this.allSelectableObjects()
         let next = all[0];
         if (!next) {
-            return;
+            return Promise.resolve();
         }
         if (this.selectedObject) {
             const index = all.indexOf(this.selectedObject);
             next = all[index + 1] || all[0];
         }
         if (next.metaType === 'place') {
-            this.placeClick(next.label)
+            return this.placeClick(next.label)
         }
         if (next.metaType === 'transition') {
-            this.transitionClick(next.label)
+            return this.transitionClick(next.label)
         }
+        return Promise.resolve();
     }
 
     allSelectableObjects(): mm.MetaObject[] {
@@ -254,13 +281,35 @@ export class MetaModel {
         }
     }
 
-    update(): void {
-        zip(this.toJson())
-            .then((data) => this.zippedJson = data)
-            .then(() => this.updateHook())
+    async update(): Promise<void> {
+        return this.updateHook();
     }
 
-    editorClick(evt: React.MouseEvent): void {
+    async commit(params: { action: string }): Promise<void> {
+        const data = await zip(this.toJson());
+        this.revision += 1;
+        this.zippedJson = data;
+        this.commits.set(this.revision, data);
+        this.logs.set(this.revision, Date.now() + ": " + params.action);
+        return this.update();
+    }
+    async revert(commit: number): Promise<void> {
+        if (commit === this.revision) {
+            return;
+        }
+        const data = this.commits.get(commit);
+        if (!data) {
+            return;
+        }
+        this.revision = commit;
+        this.zippedJson = data;
+        return unzip(data).then((jsonData) => {
+            this.loadJson(jsonData);
+            this.update();
+        });
+    }
+
+    editorClick(evt: React.MouseEvent): Promise<void> {
         let updated = false;
         switch (this.mode) {
             case "place":
@@ -271,8 +320,9 @@ export class MetaModel {
                 break;
         }
         if (updated) {
-            this.update();
+            return this.commit({ action: `add ${this.mode}` });
         }
+        return Promise.resolve();
     }
 
     restartStream(running: boolean = true): void {
@@ -460,12 +510,12 @@ export class MetaModel {
         this.m.def.arcs.forEach((a, i) => a.offset = i);
     }
 
-    placeClick(id: string): void {
+    placeClick(id: string): Promise<void> {
         const obj = this.getObj(id);
         if (this.mode === 'delete') {
             this.deletePlace(id);
             this.unsetCurrentObj();
-            return this.update();
+            return this.commit({ action: `delete ${id}` })
         }
         if (this.mode === 'arc' && this.selectedObject) {
             if (this.selectedObject.metaType === 'transition' && obj.metaType === 'place') {
@@ -482,7 +532,7 @@ export class MetaModel {
                     target: {place},
                 })
                 this.unsetCurrentObj();
-                return this.update();
+                return this.commit({ action: `add arc ${transition.label} -> ${place.label}` });
             }
             this.unsetCurrentObj();
             return this.update();
@@ -490,23 +540,25 @@ export class MetaModel {
         if (this.mode === 'token') {
             const place = this.getPlace(id);
             place.initial = place.initial + 1;
-            return this.update();
+            return this.commit({ action: `add token ${place.label}` });
         }
         if (!this.isSelected(id)) {
             this.selectedId = id;
             this.selectedObject = obj;
             return this.update();
         }
+        return Promise.resolve();
     }
 
-    placeAltClick(id: string): void {
+    placeAltClick(id: string): Promise<void> {
         if (this.mode === 'token') {
             const place = this.getPlace(id);
             if (place.initial > 0) {
                 place.initial = place.initial - 1;
-                return this.update();
+                return this.commit({ action: `remove token ${place.label}` });
             }
         }
+        return Promise.resolve();
     }
 
     getPlace(id: string): mm.Place {
@@ -534,18 +586,17 @@ export class MetaModel {
         return {ok: res.ok, inhibited: !!res.inhibited};
     }
 
-    transitionClick(id: string): void {
+    transitionClick(id: string): Promise<void> {
         if (this.isRunning()) {
             if (this.stream.dispatch({schema: this.m.def.schema, action: id, multiple: 1}).ok) {
                 return this.update();
-            } else {
-                return;
             }
+            return Promise.resolve();
         }
         if (this.mode === 'delete') {
             this.deleteTransition(id);
             this.unsetCurrentObj();
-            return this.update();
+            return this.commit({ action: `delete ${id}` });
         }
         if (this.mode === 'arc' && this.selectedObject) {
             if (this.selectedObject.metaType === 'place') {
@@ -560,7 +611,7 @@ export class MetaModel {
                     target: {transition},
                 })
                 this.unsetCurrentObj();
-                return this.update();
+                return this.commit({ action: `add arc ${place.label} -> ${transition.label}` });
             }
             this.unsetCurrentObj();
             return this.update();
@@ -570,6 +621,7 @@ export class MetaModel {
             this.selectedObject = this.getObj(id);
             return this.update();
         }
+        return Promise.resolve();
     }
 
     getTransition(id: string): mm.Transition {
@@ -584,38 +636,43 @@ export class MetaModel {
         return this.selectedObject;
     }
 
-    arcClick(id: number): void {
+    arcClick(id: number): Promise<void> {
+        let updated = false;
         const arc = this.m.def.arcs[id];
         switch (this.mode) {
             case "delete":
                 this.deleteArc(arc.offset);
+                updated = true;
                 break;
             case "arc":
                 this.m.toggleInhibitor(arc.offset);
+                updated = true;
                 break;
             case "token":
                 this.m.setArcWeight(arc.offset, arc.weight + 1);
+                updated = true;
                 break;
             default:
-                return;
+                return Promise.resolve();
         }
         this.unsetCurrentObj();
-        return this.update();
+        if (updated) {
+            return this.commit({ action: `update arc ${this.mode}` });
+        }
+        return Promise.resolve();
     }
 
-    arcAltClick(id: number): void {
+    arcAltClick(id: number): Promise<void> {
         const arc = this.m.def.arcs[id];
         switch (this.mode) {
             case "token":
                 if (!this.m.setArcWeight(arc.offset, arc.weight - 1)) {
-                    return;
+                    return Promise.resolve();
                 }
-                break;
+                return this.commit({ action: `update arc ${this.mode}` });
             default:
-                return;
+                return Promise.resolve();
         }
-        this.unsetCurrentObj();
-        return this.update();
     }
 
     uploadFile(file: File): Promise<void> {
@@ -635,8 +692,6 @@ export class MetaModel {
         });
     }
 
-    protected updateHook: () => void = () => {
-    };
 }
 
 const metaModelSingleton = new MetaModel();
