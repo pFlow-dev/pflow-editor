@@ -55,6 +55,13 @@ const initialModel = mm.newModel({
 
 const noOp = () => {};
 
+interface StreamLog {
+    ts: number,
+    revision: number,
+    action: string,
+    href: string,
+}
+
 export class MetaModel {
     m: mm.Model = initialModel;
     height: number = 600;
@@ -65,7 +72,7 @@ export class MetaModel {
     zippedJson: string = '';
     revision: number = 0;
     commits: Map<number,string> = new Map<number,string>();
-    logs: Map<number,string> = new Map<number,string>();
+    logs: Map<number,StreamLog> = new Map<number,StreamLog>();
     protected running: boolean = false;
     protected editing: boolean = false;
     protected sourceView: 'full' | 'sparse' = 'sparse';
@@ -94,7 +101,7 @@ export class MetaModel {
         });
     }
 
-    loadJson(json: string): boolean {
+    loadJson(json: string): Promise<boolean> {
         try {
             const data = JSON.parse(json) as mm.ModelDeclaration;
             if (data.version !== 'v0') {
@@ -106,12 +113,15 @@ export class MetaModel {
                 declaration: data,
                 type: data.modelType,
             });
-            this.restartStream(false);
+            return zip(json).then((zipped) => {
+                this.zippedJson = zipped;
+                this.restartStream(false);
+                return true;
+            });
         } catch (e) {
             console.error(e)
-            return false;
+            return Promise.resolve(false);
         }
-        return true;
     }
 
     clearAll(): Promise<void> {
@@ -293,8 +303,13 @@ export class MetaModel {
         this.revision += 1;
         this.zippedJson = data;
         this.commits.set(this.revision, data);
-        const msg = Date.now() + ": " + params.action;
-        this.logs.set(this.revision, msg);
+        const record = {
+            ts: Date.now(),
+            revision: this.revision,
+            action: params.action,
+            href:`?z=${data}`
+        };
+        this.logs.set(this.revision, record);
         this.cullHistory(this.revision+1)
         return this.update();
     }
@@ -317,8 +332,9 @@ export class MetaModel {
         this.revision = commit;
         this.zippedJson = data;
         return unzip(data).then((jsonData) => {
-            this.loadJson(jsonData);
-            this.update();
+            return this.loadJson(jsonData).then(() => {
+                this.update();
+            });
         });
     }
 
@@ -694,9 +710,14 @@ export class MetaModel {
             reader.onload = (e) => {
                 if (e.target) {
                     const content = e.target.result
-                    if (content && this.loadJson(content.toString())) {
-                        resolve();
-                        return;
+                    if (content) {
+                        return this.loadJson(content.toString()).then((ok) => {
+                            if (ok) {
+                                this.commit({ action: `upload ${file.name}` }).then(() => {
+                                    resolve();
+                                });
+                            }
+                        });
                     }
                 }
                 reject();
