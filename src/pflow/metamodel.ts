@@ -1,6 +1,5 @@
 import React from "react";
 import * as mm from "@pflow-dev/metamodel";
-import {defaultDeclaration} from "./model";
 import {Action} from "./types";
 import {hideCanvas, showCanvas, snapshotSvg} from "./snapshot";
 import {loadModelFromPermLink, unzip, zip} from "./permalink";
@@ -47,13 +46,14 @@ function newStream(m: mm.Model): mm.Stream<Event> {
     return stream;
 }
 
+const noOp = () => {};
+
 const initialModel = mm.newModel({
     schema: window.location.hostname,
-    declaration: defaultDeclaration,
+    declaration: noOp,
     type: mm.ModelType.petriNet
 });
 
-const noOp = () => {};
 
 interface StreamLog {
     ts: number,
@@ -127,7 +127,7 @@ export class MetaModel {
     clearAll(): Promise<void> {
         this.m = mm.newModel({
             schema: window.location.hostname,
-            declaration: defaultDeclaration,
+            declaration: noOp,
             type: mm.ModelType.petriNet
         });
         this.restartStream(false);
