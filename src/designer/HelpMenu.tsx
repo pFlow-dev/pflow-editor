@@ -43,7 +43,7 @@ export default function HelpMenu(props: CollectionProps) {
                 }}
             >
                 <MenuItem onClick={handleClose} >
-                    <a id="github-issue-link" href={"https://github.com/pFlow-dev/pflow-editor/issues"} target="_blank">
+                    <a id="github-issue-link" href={"https://github.com/pFlow-dev/pflow-editor/issues"} target="_blank" rel="noreferrer">
                         <GitHub />&nbsp;Ask a question
                     </a>
                 </MenuItem>

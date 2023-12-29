@@ -56,7 +56,7 @@ export default function SubMenu(props: SubMenuProps) {
             </a>
         </Tooltip>
         <Tooltip title="code sandbox">
-            <a id="sandboxlink" href={"../sandbox/?z="+metaModel.zippedJson} target="_blank">
+            <a id="sandboxlink" href={"../sandbox/?z="+metaModel.zippedJson} target="_blank" rel="noreferrer">
                 <IconButton sx={{color}} aria-label="permalink" color="secondary">
                     <svg data-testid="ImageIcon" width="24px" height="24px" viewBox="0 0 24 24">
                         <path stroke={color} fill={color}
