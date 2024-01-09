@@ -16,7 +16,7 @@
     "@types/node": "^16.18.41",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
-    "@uiw/react-textarea-code-editor": "^2.1.7",
+    "@uiw/react-textarea-code-editor": "^3.0.2",
     "@web3-react/eip1193": "^8.2.2",
     "@web3-react/metamask": "^8.2.3",
     "jszip": "^3.10.1",

@@ -36,7 +36,9 @@ export default function Transition(props: TransitionProps) {
     }
 
     function startDrag(evt: React.MouseEvent) {
-        setState({dragging: true});
+        if (!metaModel.isRunning()) {
+            setState({dragging: true});
+        }
         evt.stopPropagation();
     }
 
@@ -84,7 +86,12 @@ export default function Transition(props: TransitionProps) {
         evt.stopPropagation();
     }
 
-    const t = metaModel.getTransition(props.id);
+    let t = {} as { position: { x: number, y: number } }
+    try {
+        t = metaModel.getTransition(props.id);
+    } catch { // REVIEW: likely this only happens during development
+        return <g></g>
+    }
 
     return (
         <g

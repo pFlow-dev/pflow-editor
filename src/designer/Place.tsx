@@ -53,7 +53,9 @@ export default function Place(props: PlaceProps) {
     }
 
     function startDrag(evt: React.MouseEvent) {
-        setState({dragging: true});
+        if (!metaModel.isRunning()) {
+            setState({dragging: true});
+        }
         evt.stopPropagation();
     }
 
@@ -96,7 +98,12 @@ export default function Place(props: PlaceProps) {
         evt.stopPropagation();
     }
 
-    const p = metaModel.getPlace(props.id).position;
+    let p = { x: 0, y: 0}
+    try {
+        p = metaModel.getPlace(props.id).position;
+    } catch { // REVIEW: likely this only happens during development
+        return <g></g>
+    }
 
     return (
         <g

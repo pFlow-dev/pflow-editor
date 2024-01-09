@@ -5,6 +5,7 @@ import Transition from "./Transition";
 import Source from "./Source";
 import {MetaModel} from "../pflow";
 import History from "./History";
+import SubMenu from "./SubMenu";
 
 interface EditorProps {
     metaModel: MetaModel;
@@ -27,6 +28,7 @@ export default function Editor(props: EditorProps): React.ReactElement {
     if (!selectedObj) {
         return <React.Fragment>
             <Box sx={{m: 2}}>
+                <SubMenu metaModel={metaModel}></SubMenu>
                 <Source metaModel={metaModel}/>
             </Box>
         </React.Fragment>;
@@ -36,6 +38,7 @@ export default function Editor(props: EditorProps): React.ReactElement {
         case 'place': { // FIXME: update selected object system
             return <React.Fragment>
                 <Box sx={{marginTop, marginLeft}}>
+                    <SubMenu metaModel={metaModel}></SubMenu>
                     <Place selectedObj={selectedObj} metaModel={props.metaModel}/>
                 </Box>
             </React.Fragment>;
@@ -43,6 +46,7 @@ export default function Editor(props: EditorProps): React.ReactElement {
         case 'transition': {
             return <React.Fragment>
                 <Box sx={{marginTop, marginLeft}}>
+                    <SubMenu metaModel={metaModel}></SubMenu>
                     <Transition selectedObj={selectedObj} metaModel={props.metaModel}/>
                 </Box>
             </React.Fragment>;
@@ -50,6 +54,7 @@ export default function Editor(props: EditorProps): React.ReactElement {
         default: {
             return <React.Fragment>
                 <Box sx={{m: 2}}>
+                    <SubMenu metaModel={metaModel}></SubMenu>
                     <Source metaModel={props.metaModel}/>
                 </Box>
             </React.Fragment>;

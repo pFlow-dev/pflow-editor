@@ -31,8 +31,8 @@ export default function Designer(props: DesignerProps): React.ReactElement {
              height={metaModel.height}
              onClick={onClick}>
 
-            <foreignObject id="snapshotCanvas" x={0} y={0} width={"100%"} height={metaModel.height}>
-                <canvas id="pflow-canvas" width={svgWidth} height={metaModel.height} style={{display: 'none'}}/>
+            <foreignObject id="designer-canvas" x={0} y={0} width={"100%"} height={metaModel.height}>
+                <canvas id="pflow-canvas" width={svgWidth} height={metaModel.height} />
             </foreignObject>
 
             <svg id="pflow-svg"

@@ -46,7 +46,7 @@ function getQueryParams(str = window?.location?.search, separator = '&'): Record
 export function loadModelFromPermLink(): Promise<mm.Model> {
     const zippedJson = getQueryParams()['z']
     if (zippedJson) {
-        return unzip(zippedJson).then((json) => {
+        return unzip(zippedJson, 'model.json').then((json) => {
             const m = JSON.parse(json) as mm.ModelDeclaration;
             if (m.version !== 'v0') {
                 console.warn("model version mismatch, expected: v0 got: " + m.version);
@@ -69,16 +69,16 @@ export function zip(data: string): Promise<string> {
     return zip.generateAsync({type: "base64"});
 }
 
-export function unzip(data: string): Promise<string> {
+export function unzip(data: string, filename: string): Promise<string> {
     return JSZip.loadAsync(data, { base64: true })
         .then((z)=> {
-            const f =  z.file("model.json");
+            const f =  z.file(filename);
             if (f) {
                 return f.async("string").then((json) => {
                     return json;
                 });
             }
-            return Promise.reject('no model.json found');
+            return "";
         }).catch((e) => {
             console.error(e);
             return Promise.reject(e);

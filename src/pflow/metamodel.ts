@@ -64,6 +64,7 @@ interface StreamLog {
 
 export class MetaModel {
     m: mm.Model = initialModel;
+    urlLoaded: Promise<void> = Promise.resolve();
     height: number = 600;
     selectedObject: mm.MetaObject | null = null;
     selectedId: string | null = null;
@@ -82,23 +83,26 @@ export class MetaModel {
 
     constructor(m?: mm.Model) {
         this.onHotkeyDown = (evt) => {
-            this.editing || this.onKeyup(evt);
+            this.onKeyup(evt);
         };
         this.onHotkeyUp = (evt) => {
-            this.editing || this.onKeydown(evt);
+            this.onKeydown(evt);
         };
         window.addEventListener('keyup', this.onHotkeyDown);
         window.addEventListener('keydown', this.onHotkeyUp);
-
-        loadModelFromPermLink().then((urlModel) => {
+        this.urlLoaded = loadModelFromPermLink().then((urlModel) => {
             this.m = urlModel;
             this.stream = newStream(this.m);
             this.commit({action: 'load from permalink'});
         }).catch(() => {
-            this.m = m || initialModel;
+            this.m = initialModel;
             this.stream = newStream(this.m);
             this.commit({action: 'load initial model'});
         });
+    }
+
+    isEditing() {
+        return this.editing
     }
 
     loadJson(json: string): Promise<boolean> {
@@ -134,18 +138,72 @@ export class MetaModel {
         return this.commit({ action: "clear all" });
     };
 
-    stats() {
-        const {places, transitions, arcs} = this.m.def;
-        return {
-            revision: this.revision,
-            places: places.size,
-            transitions: transitions.size,
-            arcs: arcs.length,
-        }
-    }
-
     toJson(): string {
-        return JSON.stringify(this.m.toObject(this.sourceView), null, 1)
+        const places: any[] = [];
+        this.m.def.places.forEach((p) => {
+            places.push([
+                p.label,
+                `{ "offset": ${p.offset}, "initial": ${p.initial}, "capacity": ${p.capacity}, "x": ${p.position.x}, "y": ${p.position.y} }`
+            ])
+        });
+
+        const transitions: any[] = [];
+        this.m.def.transitions.forEach((t) => {
+            transitions.push([
+                t.label,
+                `{ "x": ${t.position.x}, "y": ${t.position.y} }`
+            ])
+        });
+
+        const arcs: any[] = [];
+        this.m.def.arcs.forEach((a) => {
+            arcs.push([
+                a.source?.place?.label || a.source?.transition?.label,
+                a.target?.place?.label || a.target?.transition?.label,
+                a.weight,
+                !!a.inhibit,
+            ])
+        });
+
+        let out = `{\n  "modelType": "${this.m.def.type}",\n  "version": "v0",`
+        out += `\n  "places": {\n`
+        places.forEach((p) => {
+            out += `    "${p[0]}": ${p[1]},\n`
+        });
+        if (places.length > 0) {
+            out = out.substr(0, out.length - 2); // trim last comma
+        } else {
+            out = out.substr(0, out.length - 1); // trim last newlin
+        }
+        out += `\n  },\n  "transitions": {\n`
+        transitions.forEach((t) => {
+            out += `    "${t[0]}": ${t[1]},\n`
+        });
+        if (transitions.length > 0) {
+            out = out.substr(0, out.length - 2); // trim last comma
+        } else {
+            out = out.substr(0, out.length - 1); // trim last newline
+        }
+        out += `\n  },\n  "arcs": [\n`
+        arcs.forEach((a) => {
+            if (a[3] === false) {
+                out += `    { "source": "${a[0]}", "target": "${a[1]}", "weight": ${a[2]} },\n`
+            } else {
+                out += `    { "source": "${a[0]}", "target": "${a[1]}", "weight": ${a[2]}, "inhibit": ${a[3]} },\n`
+            }
+        });
+        if (arcs.length > 0) {
+            out = out.substr(0, out.length - 2); // trim last comma
+        } else {
+            out = out.substr(0, out.length - 1); // trim last newline
+        }
+        out += `\n  ]\n}`
+
+
+        return out
+    }
+    toSource(): string {
+        return this.toJson();
     }
 
     onArrow(button: 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'ArrowDown'): void {
@@ -179,18 +237,27 @@ export class MetaModel {
     }
 
     onKeydown(evt: KeyboardEvent) {
-        if (evt.ctrlKey && evt.key === 'z') {
-            this.unsetCurrentObj();
-            this.revert(this.revision - 1);
-            evt.preventDefault();
-            evt.stopPropagation();
-            return;
+        if (evt.ctrlKey || evt.metaKey) {
+            switch (evt.key) {
+                case 'z':
+                    this.unsetCurrentObj();
+                    this.revert(this.revision - 1);
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    this.menuAction("select")
+                    return;
+                case 'y':
+                    this.unsetCurrentObj();
+                    this.revert(this.revision + 1);
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    this.menuAction("select")
+                    return;
+                default:
+                    return
+            }
         }
-        if (evt.ctrlKey && evt.key === 'y') {
-            this.unsetCurrentObj();
-            this.revert(this.revision + 1);
-            evt.preventDefault();
-            evt.stopPropagation();
+        if (this.editing) {
             return;
         }
         switch (evt.key) {
@@ -198,8 +265,6 @@ export class MetaModel {
             case 'Backspace':
             case 'Escape':
             case 'Tab':
-                evt.preventDefault();
-                evt.stopPropagation();
                 break;
             case 'ArrowLeft':
             case 'ArrowRight':
@@ -208,9 +273,14 @@ export class MetaModel {
                 this.onArrow(evt.key);
                 this.commit({ action: evt.key });
         }
+        evt.preventDefault();
+        evt.stopPropagation();
     }
 
     async onKeyup(evt: KeyboardEvent) {
+        if (this.editing || evt.metaKey || evt.ctrlKey) {
+            return;
+        }
         switch (evt.key) {
             case 'Tab':
                 this.onTab();
@@ -331,10 +401,9 @@ export class MetaModel {
         }
         this.revision = commit;
         this.zippedJson = data;
-        return unzip(data).then((jsonData) => {
-            return this.loadJson(jsonData).then(() => {
-                this.update();
-            });
+        return unzip(data, 'model.json').then(async (jsonData: string) => {
+            await this.loadJson(jsonData);
+            this.update();
         });
     }
 
