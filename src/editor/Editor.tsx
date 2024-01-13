@@ -35,7 +35,7 @@ export default function Editor(props: EditorProps): React.ReactElement {
     }
 
     switch (selectedObj.metaType) {
-        case 'place': { // FIXME: update selected object system
+        case 'place': {
             return <React.Fragment>
                 <Box sx={{marginTop, marginLeft}}>
                     <SubMenu metaModel={metaModel}></SubMenu>

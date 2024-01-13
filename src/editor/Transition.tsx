@@ -2,6 +2,8 @@ import React from 'react';
 import {TextField} from '@mui/material';
 import {MetaModel} from "../pflow";
 import {Arc} from "./Arc";
+import Tooltip from "@mui/material/Tooltip";
+import {Clear} from "@mui/icons-material";
 
 function valToInt(value: string): number {
     const val = parseInt(value);
@@ -19,10 +21,10 @@ interface TransitionProps {
 export default function Transition(props: TransitionProps) {
     const {metaModel} = props;
     const transition = metaModel.getTransition(props.selectedObj.label);
-    const onFocus = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.beginEdit();
-    const onBlur = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.endEdit();
+    const onFocus = () => metaModel.beginEdit();
+    const onBlur = () => metaModel.endEdit();
 
-    function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    async function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
         // construct a new label and avoid collision with existing objects
 
         switch (evt.target.id) {
@@ -46,7 +48,7 @@ export default function Transition(props: TransitionProps) {
 
             }
         }
-        metaModel.commit({ action: `transition change ${evt.target.id}: ${evt.target.value}` });
+        await metaModel.commit({ action: `transition change ${evt.target.id}: ${evt.target.value}` });
         return true;
     }
 
@@ -82,6 +84,14 @@ export default function Transition(props: TransitionProps) {
                        onFocus={onFocus}
                        onBlur={onBlur}
                        value={transition.position.y}/>
+            <Tooltip sx={{marginBottom: "-29px"}} title={"delete"}>
+                <Clear onClick={async () => {
+                        metaModel.m.deleteTransition(transition.label);
+                        metaModel.unsetCurrentObj();
+                        await metaModel.commit({ action: `transition delete ${transition.label}` });
+                    }}
+                />
+            </Tooltip>
         </form>
         <br/>
         {arcs}

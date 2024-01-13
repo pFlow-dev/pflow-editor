@@ -23,10 +23,10 @@ interface DesignToolbarProps {
 export default function DesignToolbar(props: DesignToolbarProps) {
     const {metaModel} = props;
 
-    function menuAction(action: Action) {
-        metaModel.menuAction(action);
+    async function menuAction(action: Action): Promise<void> {
+        await metaModel.menuAction(action);
         metaModel.unsetCurrentObj();
-        metaModel.update();
+        return metaModel.update();
     }
 
     const selectedColor = "#8140ff";

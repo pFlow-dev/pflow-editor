@@ -24,10 +24,10 @@ export default function FileMenu(props: CollectionProps) {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const handleFile = (file: File) => {
-        metaModel.uploadFile(file).then(() => {
-            metaModel.menuAction("select");
-            metaModel.update();
+    const handleFile = async (file: File) => {
+        metaModel.uploadFile(file).then(async () => {
+            await metaModel.menuAction("select");
+            await metaModel.update();
         })
         handleClose();
     };
@@ -37,12 +37,12 @@ export default function FileMenu(props: CollectionProps) {
         handleClose();
     }
 
-    const handleSnapshot = () => {
+    const handleSnapshot = async () => {
         if (metaModel.mode !== "snapshot") {
-            metaModel.menuAction("snapshot")
+            await metaModel.menuAction("snapshot")
         }
         downloadPngFromCanvas()
-        metaModel.update();
+        await metaModel.update();
         handleClose();
     }
 

@@ -13,16 +13,16 @@ interface SubMenuProps {
 export default function SubMenu(props: SubMenuProps) {
     const metaModel = props.metaModel;
 
-    const handleFile = (file: File) => {
-        metaModel.uploadFile(file).then(() => {
-            metaModel.menuAction("select");
-            metaModel.update();
+    const handleFile = async (file: File) => {
+        return metaModel.uploadFile(file).then(async () => {
+            await metaModel.menuAction("select");
+            return metaModel.update();
         })
     };
 
-    function createPngLink() {
+    async function createPngLink() {
         if (metaModel.mode !== "snapshot") {
-            metaModel.menuAction("snapshot")
+            await metaModel.menuAction("snapshot")
         }
         downloadPngFromCanvas()
     }
@@ -36,9 +36,8 @@ export default function SubMenu(props: SubMenuProps) {
                 </IconButton>
             </Tooltip>
         </FileUploader>
-        <select value={metaModel.m.def.type} onChange={(e) => {
-            metaModel.m.def.type = e.target.value as any;
-            metaModel.commit({action: `change model type: ${e.target.value}`});
+        <select value={metaModel.m.def.type} onChange={async (e) => {
+            await metaModel.setModelType(e.target.value as any)
         }}>
             <option value="petriNet">PetriNet</option>
             <option value="workflow">Workflow</option>

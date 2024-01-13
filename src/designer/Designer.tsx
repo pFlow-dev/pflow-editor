@@ -11,8 +11,8 @@ interface DesignerProps {
 
 export default function Designer(props: DesignerProps): React.ReactElement {
     const {metaModel} = props;
-    const onClick = (evt: React.MouseEvent) => {
-        props.metaModel.editorClick(evt);
+    const onClick = async (evt: React.MouseEvent) => {
+        return props.metaModel.editorClick(evt);
     };
 
     const [svgWidth, setSvgWidth] = React.useState(window.innerWidth);
@@ -29,7 +29,8 @@ export default function Designer(props: DesignerProps): React.ReactElement {
         <svg id="pflow-svg-outer"
              width={svgWidth}
              height={metaModel.height}
-             onClick={onClick}>
+             onClick={onClick}
+        >
 
             <foreignObject id="designer-canvas" x={0} y={0} width={"100%"} height={metaModel.height}>
                 <canvas id="pflow-canvas" width={svgWidth} height={metaModel.height} />
@@ -39,7 +40,7 @@ export default function Designer(props: DesignerProps): React.ReactElement {
                  width={svgWidth}
                  height={metaModel.height}
                  onContextMenu={(evt) => evt.preventDefault()}
-                 onClick={onClick}>
+            >
                 <defs>
                     <marker id="markerArrow1" markerWidth="23" markerHeight="13" refX="31" refY="6" orient="auto">
                         <rect className="arrowSpace1" width="28" height="3" fill="#ffffff" stroke="#ffffff" x="3"
@@ -73,12 +74,12 @@ export default function Designer(props: DesignerProps): React.ReactElement {
                 <EditMenu metaModel={metaModel}/>
             </foreignObject>
             <foreignObject id="editmenu-foreign" x={280} y={9} width={"200px"} height="40px">
-                <HelpMenu metaModel={metaModel}/>
+                <HelpMenu/>
             </foreignObject>
             <foreignObject id="pflow-foreign" x={svgWidth - 133} y={12} width={"100%"} height="40px">
-                <iframe
+                <iframe style={{border: 0 }}
                     src="https://ghbtns.com/github-btn.html?user=pFlow-dev&repo=pflow-editor&type=star&count=true&size=large"
-                    frameBorder="0" scrolling="0" width="130" height="40" title="GitHub">
+                    width="130" height="40" title="GitHub">
                 </iframe>
             </foreignObject>
         </svg>

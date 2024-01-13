@@ -52,16 +52,16 @@ export default function Arc(props: ArcProps) {
         }
     }
 
-    function onClick(evt: React.MouseEvent<SVGCircleElement, MouseEvent>) {
+    async function onClick(evt: React.MouseEvent<SVGCircleElement, MouseEvent>) {
         evt.stopPropagation();
         evt.preventDefault();
-        metaModel.arcClick(arc.offset);
+        await metaModel.arcClick(arc.offset);
     }
 
-    function onContextMenu(evt: React.MouseEvent<SVGCircleElement, MouseEvent>) {
+    async function onContextMenu(evt: React.MouseEvent<SVGCircleElement, MouseEvent>): Promise<void> {
         evt.stopPropagation();
         evt.preventDefault();
-        metaModel.arcAltClick(arc.offset);
+        return metaModel.arcAltClick(arc.offset);
     }
 
     function getMarker() {
@@ -80,6 +80,12 @@ export default function Arc(props: ArcProps) {
         x1, y1, x2, y2, midX, midY, offsetX, offsetY
     } = positions();
 
+    let weight = "  ";
+
+    if (metaModel.m.def.type === "petriNet") {
+        weight = `${Math.abs(arc.weight)}`
+    }
+
     return (
         <g onContextMenu={onContextMenu}>
             <line
@@ -90,7 +96,7 @@ export default function Arc(props: ArcProps) {
                 x1={x1} y1={y1}
                 x2={x2} y2={y2}
             />
-            <text id={props.id + '[label]'} x={midX - offsetX} y={midY + offsetY}>{Math.abs(arc.weight)}</text>
+            <text id={props.id + '[label]'} x={midX - offsetX} y={midY + offsetY}>{weight}</text>
             <circle id={props.id + '[handle]'}
                     r={13} cx={midX} cy={midY} fill="transparent" stroke="transparent"
                     onClick={onClick}

@@ -2,16 +2,10 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {MetaModel} from "../pflow";
 import {GitHub, PermMedia, Psychology} from "@mui/icons-material";
 
-
-type CollectionProps = {
-    metaModel: MetaModel;
-}
-
 const showTutorial = false;
-export default function HelpMenu(props: CollectionProps) {
+export default function HelpMenu() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -49,7 +43,7 @@ export default function HelpMenu(props: CollectionProps) {
                 </MenuItem>
             </Menu>
         </div>)
-    };
+    }
 
     return (
         <div>

@@ -1,9 +1,7 @@
 import React from "react";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import * as mm from "@pflow-dev/metamodel";
-
 import {MetaModel} from "../pflow";
-import SubMenu from "./SubMenu";
 
 interface SouceViewProps {
     metaModel: MetaModel;
@@ -12,7 +10,7 @@ interface SouceViewProps {
 export default function Source(props: SouceViewProps) {
     const {metaModel} = props;
 
-    const update = (updatedSource: string) => {
+    const update = async (updatedSource: string) => {
         if (metaModel.isEditing()) {
             metaModel.urlLoaded.then(() => {
                 try{
@@ -51,8 +49,8 @@ export default function Source(props: SouceViewProps) {
                 fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
             }}
             onFocus={() => metaModel.beginEdit()}
-            onBlur={(evt) => {
-                update(evt.target.value)
+            onBlur={ async (evt) => {
+                await update(evt.target.value)
                 metaModel.endEdit()
             }}
         />

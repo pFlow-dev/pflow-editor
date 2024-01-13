@@ -42,15 +42,15 @@ export default function Transition(props: TransitionProps) {
         evt.stopPropagation();
     }
 
-    function endDrag(evt: React.MouseEvent) {
+    async function endDrag(evt: React.MouseEvent) {
         if (!metaModel.isRunning() && nodeState.modified) {
-            metaModel.commit({ action: "move transition" });
+            await metaModel.commit({ action: "move transition" });
         }
         setState({dragging: false});
         evt.stopPropagation();
     }
 
-    function dragging(evt: React.MouseEvent) {
+    async function dragging(evt: React.MouseEvent) {
         if (nodeState.dragging) {
             setState({dragging: true, modified: true });
             if (['execute', 'delete'].includes(metaModel.mode)) {
@@ -63,7 +63,7 @@ export default function Transition(props: TransitionProps) {
             }
             obj.position.x = obj.position.x + evt.movementX;
             obj.position.y = obj.position.y + evt.movementY;
-            metaModel.update();
+            await metaModel.update();
         }
         evt.stopPropagation();
     }
@@ -81,8 +81,8 @@ export default function Transition(props: TransitionProps) {
         return '#ffffff';
     }
 
-    function onClick(evt: React.MouseEvent) {
-        metaModel.transitionClick(props.id);
+    async function onClick(evt: React.MouseEvent) {
+        await metaModel.transitionClick(props.id);
         evt.stopPropagation();
     }
 

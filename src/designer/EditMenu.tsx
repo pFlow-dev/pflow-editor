@@ -5,12 +5,10 @@ import MenuItem from '@mui/material/MenuItem';
 import {MetaModel} from "../pflow";
 import {ClearAll, Undo, Redo} from "@mui/icons-material";
 
-// TODO: support history, undo, redo, force layout
-
-type CollectionProps = {
+type EditMenuProps = {
     metaModel: MetaModel;
 }
-export default function EditMenu(props: CollectionProps) {
+export default function EditMenu(props: EditMenuProps) {
     const { metaModel } = props;
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -20,19 +18,19 @@ export default function EditMenu(props: CollectionProps) {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const handleClear = () => {
-        metaModel.menuAction("select");
-        metaModel.clearAll();
+    const handleClear = async () => {
+        await metaModel.menuAction("select");
+        await metaModel.clearAll();
         handleClose();
     };
 
-    const handleUndo = () => {
-        metaModel.revert(metaModel.revision - 1);
+    const handleUndo = async () => {
+        await metaModel.revert(metaModel.revision - 1);
         metaModel.unsetCurrentObj();
         handleClose();
     }
-    const handleRedo = () => {
-        metaModel.revert(metaModel.revision + 1);
+    const handleRedo = async () => {
+        await metaModel.revert(metaModel.revision + 1);
         metaModel.unsetCurrentObj();
         handleClose();
     }

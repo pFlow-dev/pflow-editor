@@ -59,15 +59,15 @@ export default function Place(props: PlaceProps) {
         evt.stopPropagation();
     }
 
-    function endDrag(evt: React.MouseEvent) {
+    async function endDrag(evt: React.MouseEvent) {
         if (nodeState.modified) {
-            metaModel.commit({action: "move place"});
+            await metaModel.commit({action: "move place"});
         }
         setState({dragging: false});
         evt.stopPropagation();
     }
 
-    function dragging(evt: React.MouseEvent) {
+    async function dragging(evt: React.MouseEvent) {
         if (nodeState.dragging) {
             setState({dragging: true, modified: true })
 
@@ -82,18 +82,18 @@ export default function Place(props: PlaceProps) {
             obj.position.x = obj.position.x + evt.movementX;
             obj.position.y = obj.position.y + evt.movementY;
             metaModel.selectedObject = obj;
-            metaModel.update();
+            await metaModel.update();
         }
         evt.stopPropagation();
     }
 
-    function onClick(evt: React.MouseEvent) {
-        metaModel.placeClick(props.id);
+    async function onClick(evt: React.MouseEvent) {
+        await metaModel.placeClick(props.id);
         evt.stopPropagation();
     }
 
-    function onAltClick(evt: React.MouseEvent) {
-        metaModel.placeAltClick(props.id);
+    async function onAltClick(evt: React.MouseEvent) {
+        await metaModel.placeAltClick(props.id);
         evt.preventDefault();
         evt.stopPropagation();
     }

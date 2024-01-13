@@ -2,6 +2,8 @@ import React from 'react';
 import {TextField} from '@mui/material';
 import {MetaModel} from "../pflow";
 import {Arc} from "./Arc";
+import Tooltip from "@mui/material/Tooltip";
+import {Clear} from "@mui/icons-material";
 
 interface PlaceProps {
     selectedObj: any;
@@ -12,10 +14,10 @@ export default function Place(props: PlaceProps) {
     const place = props.selectedObj;
     const metaModel = props.metaModel;
 
-    const onFocus = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.beginEdit();
-    const onBlur = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.endEdit();
+    const onFocus = () => metaModel.beginEdit();
+    const onBlur = () => metaModel.endEdit();
 
-    function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    async function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
         const attribute = evt.target.id;
         const value = metaModel.m.newLabel(evt.target.value);
 
@@ -55,7 +57,7 @@ export default function Place(props: PlaceProps) {
             default: {
             }
         }
-        props.metaModel.commit({ action: `place change ${attribute}: ${value}` });
+        return props.metaModel.commit({ action: `place change ${attribute}: ${value}` });
     }
 
     const marginTop = "5px";
@@ -94,6 +96,14 @@ export default function Place(props: PlaceProps) {
                        onFocus={onFocus}
                        onBlur={onBlur}
                        onChange={handleChange} value={place.position.y}/>
+            <Tooltip sx={{marginBottom: "-29px"}} title={"delete"}>
+                <Clear onClick={async () => {
+                        metaModel.m.deletePlace(place.label);
+                        metaModel.unsetCurrentObj();
+                        await metaModel.commit({ action: `place delete ${place.label}` });
+                    }
+                }/>
+            </Tooltip>
         </form>
         <br/>
         {arcs}

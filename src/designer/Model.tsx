@@ -13,11 +13,6 @@ interface ModelProps {
 export default function Model(props: ModelProps) {
     const {metaModel, schema} = props;
     const {places, transitions} = metaModel.m.def;
-    const placeLabel: string[] = [];
-
-    places.forEach((pl: mm.Place, label: string) => {
-        placeLabel[pl.offset] = label;
-    })
 
     const placeElements = Array.from(places.keys()).map((label) =>
         <Place key={label} id={label} metaModel={metaModel}/>,

@@ -2,6 +2,8 @@ import React from 'react';
 import {MenuItem, Select, TextField} from '@mui/material';
 import {MetaModel} from "../pflow";
 import * as mm from "@pflow-dev/metamodel";
+import {Clear, SwapHoriz} from "@mui/icons-material";
+import Tooltip from "@mui/material/Tooltip";
 
 export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
 
@@ -16,22 +18,22 @@ export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
     }
     const {arc, metaModel} = props;
     const subtype = arc.inhibit ? "Inhibitor" : "Arc";
-    const onFocus = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.beginEdit();
-    const onBlur = (evt: React.FocusEvent<HTMLInputElement>) => metaModel.endEdit();
+    const onFocus = () => metaModel.beginEdit();
+    const onBlur = () => metaModel.endEdit();
 
-    function handleTypeChange() {
+    async function handleTypeChange() {
         const toggle = !arc.inhibit ? "Inhibitor" : "Arc";
         if (metaModel.m.toggleInhibitor(arc.offset)) {
-            metaModel.commit({ action: "toggle arc type: "+toggle });
+            await metaModel.commit({ action: "toggle arc type: "+toggle });
         }
     }
 
-    function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    async function handleChange(evt: React.ChangeEvent<HTMLInputElement>) {
         if (!place || !transition || !source || !target) {
             throw new Error("invalid arc");
         }
         if (metaModel.m.setArcWeight(arc.offset, parseInt(evt.target.value))) {
-            metaModel.commit({ action: "change arc weight: "+evt.target.value });
+            await metaModel.commit({ action: "change arc weight: "+evt.target.value });
         }
     }
 
@@ -46,6 +48,7 @@ export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
         </Select>;
     };
 
+
     return <React.Fragment>
         <form noValidate autoComplete="off">
             <SelectType/>
@@ -55,8 +58,25 @@ export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
                        variant="outlined" onChange={handleChange} value={arc.weight}/>
             <TextField sx={{width, marginTop}} id="source" label="Source" variant="outlined" aria-readonly={true}
                        disabled={true} value={source?.label}/>
+            <Tooltip title="swap">
+                <SwapHoriz sx={{marginBottom: "-6px"}}
+                            onClick={async () => {
+                                console.log("swap arc: "+arc.offset);
+                                metaModel.m.swapArc(arc.offset);
+                                await metaModel.commit({ action: "swap arc" });
+                            }}
+                />
+            </Tooltip>
             <TextField sx={{width, marginTop}} id="target" label="Target" variant="outlined" aria-readonly={true}
                        disabled={true} value={target?.label}/>
+            <Tooltip sx={{marginBottom: "-5px"}} title={"delete"}>
+                <Clear
+                    onClick={async () => {
+                        metaModel.m.deleteArc(arc.offset);
+                        await metaModel.commit({ action: "delete arc" });
+                    }}
+                />
+            </Tooltip>
         </form>
     </React.Fragment>;
 }
