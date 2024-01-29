@@ -1,5 +1,5 @@
 import React from "react";
-import {IconButton, Tooltip} from "@mui/material";
+import {IconButton, Tooltip } from "@mui/material";
 import {MetaModel} from "../pflow";
 import {Download, Image, Link, UploadFile} from "@mui/icons-material";
 import {downloadPngFromCanvas} from "../pflow/snapshot";
@@ -47,6 +47,17 @@ export default function SubMenu(props: SubMenuProps) {
         <button style={{border: "none"}} onClick={() => metaModel.revert(metaModel.revision - 1)}>{"<"}</button>
         <button style={{border: "none"}}> rev. {metaModel.revision}</button>
         <button style={{border: "none"}} onClick={() => metaModel.revert(metaModel.revision + 1)}>{">"}</button>
+        <Tooltip title="All submitted software & models are shared under 'The Unlicense'">
+            <a style={{ color: "black"}} id="submittedDataLicense" href={"/p/UNLICENSE.txt"} target="_blank" rel="noreferrer">
+                <IconButton sx={{color}} aria-label="permalink" color="secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 5.292 5.292">
+                        <path fill={color}
+                              d="M128.355 137.62c-.339.016-.426.305-.432.44h-.473c.021-.524.394-.844.913-.844.584 0 1.018.367 1.018 1.198 0 .513-.246 1.122-1.016 1.122-.587 0-.902-.437-.91-.78h.474c.008.156.119.365.431.38.347-.01.492-.28.492-.722 0-.765-.339-.788-.497-.794m-.032-1.889a2.647 2.647 0 0 1 0 5.292 2.647 2.647 0 0 1 0-5.292m0 4.763a2.12 2.12 0 0 0 2.117-2.117 2.12 2.12 0 0 0-2.117-2.117 2.12 2.12 0 0 0-2.117 2.117 2.12 2.12 0 0 0 2.117 2.117"
+                              transform="translate(-125.677 -135.731)"/>
+                    </svg>
+                </IconButton>
+            </a>
+        </Tooltip>
         <Tooltip title="export json">
             <IconButton sx={{color}} aria-label="download json" onClick={
                 () => downloadModelJson(metaModel.toJson())
@@ -60,14 +71,14 @@ export default function SubMenu(props: SubMenuProps) {
             </IconButton>
         </Tooltip>
         <Tooltip title="permalink">
-            <a id="permalink" href={"?z=" + metaModel.zippedJson}>
+            <a id="permalink" href={"/p/?z=" + metaModel.zippedJson}>
                 <IconButton sx={{color}} aria-label="permalink" color="secondary">
                     <Link/>
                 </IconButton>
             </a>
         </Tooltip>
         <Tooltip title="code sandbox">
-            <a id="sandboxlink" href={"../sandbox/?z=" + metaModel.zippedJson} target="_blank" rel="noreferrer">
+            <a id="sandboxlink" href={"/sandbox/?z=" + metaModel.zippedJson} target="_blank" rel="noreferrer">
                 <IconButton sx={{color}} aria-label="permalink" color="secondary">
                     <svg data-testid="ImageIcon" width="24px" height="24px" viewBox="0 0 24 24">
                         <path stroke={color} fill={color}
@@ -75,7 +86,6 @@ export default function SubMenu(props: SubMenuProps) {
                     </svg>
                 </IconButton>
             </a>
-
         </Tooltip>
     </React.Fragment>;
 }

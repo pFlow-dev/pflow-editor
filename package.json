@@ -1,6 +1,6 @@
 {
   "name": "pflow-editor",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "homepage": "./",
   "dependencies": {
     "@emotion/react": "^11.11.1",

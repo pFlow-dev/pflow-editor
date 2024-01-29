@@ -27,7 +27,6 @@ export const keyToAction: Record<string, Action> = Object.freeze({
 
 
 interface Event {
-    schema: string;
     action: string;
     multiple: number;
 }
@@ -37,10 +36,10 @@ export function getModel(): MetaModel {
 }
 
 function newStream(m: mm.Model): mm.Stream<Event> {
-    const stream = new mm.Stream<Event>({models: [m]});
+    const stream = new mm.Stream<Event>({model: m});
     stream.dispatcher.onFail((s , evt) => {
-        // this should never happen
-        // because we only fire events that are enabled
+        // this app doesn't let the user make invalid transitions
+        // so this should never happen
         console.error({ s, evt }, 'onFail');
     })
     return stream;
@@ -49,7 +48,6 @@ function newStream(m: mm.Model): mm.Stream<Event> {
 const noOp = () => {};
 
 const initialModel = mm.newModel({
-    schema: window.location.hostname,
     declaration: noOp,
     type: mm.ModelType.petriNet
 });
@@ -112,7 +110,6 @@ export class MetaModel {
                 data.version = 'v0';
             }
             this.m = mm.newModel({
-                schema: window.location.hostname,
                 declaration: data,
                 type: data.modelType,
             });
@@ -129,7 +126,6 @@ export class MetaModel {
 
     clearAll(): Promise<void> {
         this.m = mm.newModel({
-            schema: window.location.hostname,
             declaration: noOp,
             type: mm.ModelType.petriNet
         });
@@ -503,7 +499,7 @@ export class MetaModel {
         this.running = running;
         this.stream = newStream(this.m);
         this.stream.restart();
-        this.stream.state.set(this.m.def.schema, this.m.initialVector());
+        this.stream.state = this.m.initialVector();
     }
 
     resizeSvg(): Promise<void> {
@@ -586,7 +582,7 @@ export class MetaModel {
     getState(): mm.Vector {
         let s = this.m.initialVector();
         if (this.isRunning()) {
-            s = this.stream.state.get(this.m.def.schema) || this.m.initialVector();
+            s = this.stream.state || this.m.initialVector();
         }
         return [...s]
     }
@@ -796,7 +792,7 @@ export class MetaModel {
 
     transitionClick(id: string): Promise<void> {
         if (this.isRunning()) {
-            if (this.stream.dispatch({schema: this.m.def.schema, action: id, multiple: 1}).ok) {
+            if (this.stream.dispatch({action: id, multiple: 1}).ok) {
                 return this.update();
             }
             return Promise.resolve();

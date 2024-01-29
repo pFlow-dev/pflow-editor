@@ -16,10 +16,7 @@ export default function Source(props: SouceViewProps) {
                 try{
                     const declaration = JSON.parse(updatedSource);
                     if (declaration && updatedSource !== metaModel.toSource()) {
-                        metaModel.m = mm.newModel({
-                            schema: metaModel.m.def.schema,
-                            declaration,
-                        }, );
+                        metaModel.m = mm.newModel({ declaration }, );
                         metaModel.restartStream(false)
                         metaModel.commit({ action: "editor updated" });
                     } else {

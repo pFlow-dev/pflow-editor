@@ -44,7 +44,13 @@ function getQueryParams(str = window?.location?.search, separator = '&'): Record
 
 
 export async function loadModelFromPermLink(): Promise<mm.Model> {
-    const zippedJson = getQueryParams()['z']
+    let zippedJson = getQueryParams()['z']
+    if (!zippedJson) {
+        const cid = sessionStorage.getItem('cid')
+        if (cid) {
+            zippedJson = sessionStorage.getItem('data');
+        }
+    }
     if (zippedJson) {
         return unzip(zippedJson, 'model.json').then((json) => {
             const m = JSON.parse(json) as mm.ModelDeclaration;
@@ -53,7 +59,6 @@ export async function loadModelFromPermLink(): Promise<mm.Model> {
                 m.version = 'v0';
             }
             return mm.newModel({
-                schema: window.location.hostname,
                 declaration: m,
                 type: m.modelType,
             });
