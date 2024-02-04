@@ -76,12 +76,6 @@ export default function Designer(props: DesignerProps): React.ReactElement {
             <foreignObject id="editmenu-foreign" x={280} y={9} width={"200px"} height="40px">
                 <HelpMenu/>
             </foreignObject>
-            <foreignObject id="pflow-foreign" x={svgWidth - 133} y={12} width={"100%"} height="40px">
-                <iframe style={{border: 0 }}
-                    src="https://ghbtns.com/github-btn.html?user=pFlow-dev&repo=pflow-editor&type=star&count=true&size=large"
-                    width="130" height="40" title="GitHub">
-                </iframe>
-            </foreignObject>
         </svg>
     </React.Fragment>
         ;
