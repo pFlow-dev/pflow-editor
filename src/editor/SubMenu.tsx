@@ -60,7 +60,7 @@ export default function SubMenu(props: SubMenuProps) {
             </IconButton>
         </Tooltip>
         <Tooltip title="permalink">
-            <a id="permalink" href={"/p/?z=" + metaModel.zippedJson}>
+            <a id="permalink" href={"?z=" + metaModel.zippedJson}>
                 <IconButton sx={{color}} aria-label="permalink" color="secondary">
                     <Link/>
                 </IconButton>
