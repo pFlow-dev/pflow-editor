@@ -71,7 +71,9 @@ export async function loadModelFromPermLink(): Promise<mm.Model> {
 export function zip(data: string): Promise<string> {
     const zip = new JSZip();
     zip.file("model.json", data);
-    return zip.generateAsync({type: "base64"});
+    return zip.generateAsync({type: "base64"}).then((content) => {
+        return content.replaceAll(' ', '+'); // REVIEW: should we be doing more URL encoding?
+    });
 }
 
 export async function unzip(data: string, filename: string): Promise<string> {
