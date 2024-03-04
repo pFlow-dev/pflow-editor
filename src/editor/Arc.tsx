@@ -61,7 +61,6 @@ export function Arc(props: { metaModel: MetaModel, arc: mm.Arc }) {
             <Tooltip title="swap">
                 <SwapHoriz sx={{marginBottom: "-6px"}}
                             onClick={async () => {
-                                console.log("swap arc: "+arc.offset);
                                 metaModel.m.swapArc(arc.offset);
                                 await metaModel.commit({ action: "swap arc" });
                             }}

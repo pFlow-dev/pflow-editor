@@ -1,5 +1,6 @@
 import * as mm from "@pflow-dev/metamodel";
-import JSZip from "jszip";
+
+import brotliPromise from 'brotli-wasm';
 
 function getQueryParams(str = window?.location?.search, separator = '&'): Record<string, any> {
     const obj: Record<string, any> = {};
@@ -42,7 +43,6 @@ function getQueryParams(str = window?.location?.search, separator = '&'): Record
     return obj;
 }
 
-
 export async function loadModelFromPermLink(): Promise<mm.Model> {
     let zippedJson = getQueryParams()['z']
     if (!zippedJson) {
@@ -52,7 +52,7 @@ export async function loadModelFromPermLink(): Promise<mm.Model> {
         }
     }
     if (zippedJson) {
-        return unzip(zippedJson, 'model.json').then((json) => {
+        return decompressBrotliDecode(zippedJson).then((json: string) => {
             const m = JSON.parse(json) as mm.ModelDeclaration;
             if (m.version !== 'v0') {
                 console.warn("model version mismatch, expected: v0 got: " + m.version);
@@ -67,27 +67,36 @@ export async function loadModelFromPermLink(): Promise<mm.Model> {
     return Promise.reject('no model found');
 }
 
-// zip and base64 encode
-export function zip(data: string): Promise<string> {
-    const zip = new JSZip();
-    zip.file("model.json", data);
-    return zip.generateAsync({type: "base64"}).then((content) => {
-        return content.replaceAll(' ', '+'); // REVIEW: should we be doing more URL encoding?
-    });
+/**
+ * Compress data using brotli & base64 encode
+ */
+export async function compressBrotliEncode(data: string): Promise<string> {
+    const brotli = await brotliPromise;
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(data);
+    const compressedData = brotli.compress(encodedData);
+    const byteNumbers = new Array(compressedData.length);
+    for (let i = 0; i < compressedData.length; i++) {
+        byteNumbers[i] = compressedData[i];
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    // @ts-ignore
+    const byteCharacters = String.fromCharCode.apply(null, byteArray);
+    return btoa(byteCharacters);
 }
 
-export async function unzip(data: string, filename: string): Promise<string> {
-    return JSZip.loadAsync(data, { base64: true })
-        .then((z)=> {
-            const f =  z.file(filename);
-            if (f) {
-                return f.async("string").then((json) => {
-                    return json;
-                });
-            }
-            return "";
-        }).catch((e) => {
-            console.error(e);
-            return Promise.reject(e);
-        });
+/**
+ * Decode with base64 & decompress brotli encoded data
+ */
+export async function decompressBrotliDecode(data: string): Promise<string> {
+    const brotli = await brotliPromise;
+    const byteCharacters = atob(data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const decompressedData = brotli.decompress(byteArray);
+    const textDecoder = new TextDecoder();
+    return textDecoder.decode(decompressedData);
 }

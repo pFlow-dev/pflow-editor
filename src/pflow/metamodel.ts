@@ -2,7 +2,7 @@ import React from "react";
 import * as mm from "@pflow-dev/metamodel";
 import {Action} from "./types";
 import {hideCanvas, showCanvas, snapshotSvg} from "./snapshot";
-import {loadModelFromPermLink, unzip, zip} from "./permalink";
+import {loadModelFromPermLink, decompressBrotliDecode, compressBrotliEncode} from "./permalink";
 
 export type MaybeNode = mm.Place | mm.Transition | null
 export const keyToAction: Record<string, Action> = Object.freeze({
@@ -113,7 +113,7 @@ export class MetaModel {
                 declaration: data,
                 type: data.modelType,
             });
-            return zip(json).then((zipped) => {
+            return compressBrotliEncode(json).then((zipped) => {
                 this.zippedJson = zipped;
                 this.restartStream(false);
                 return true;
@@ -406,7 +406,7 @@ export class MetaModel {
         if (this.running) {
             throw new Error('cannot commit while running');
         }
-        const data = await zip(this.toJson());
+        const data = await compressBrotliEncode(this.toJson());
         this.revision += 1;
         this.zippedJson = data;
         this.commits.set(this.revision, data);
@@ -438,7 +438,7 @@ export class MetaModel {
         }
         this.revision = commit;
         this.zippedJson = data;
-        return unzip(data, 'model.json').then(async (jsonData: string) => {
+        return decompressBrotliDecode(data).then(async (jsonData: string) => {
             await this.loadJson(jsonData);
             return this.update();
         });

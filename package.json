@@ -1,6 +1,6 @@
 {
   "name": "pflow-editor",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "homepage": "./",
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -8,7 +8,7 @@
     "@mui/icons-material": "^5.14.8",
     "@mui/material": "^5.14.8",
     "@openzeppelin/merkle-tree": "^1.0.5",
-    "@pflow-dev/metamodel": "^0.11.0",
+    "@pflow-dev/metamodel": "^0.12.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -19,7 +19,10 @@
     "@uiw/react-textarea-code-editor": "^3.0.2",
     "@web3-react/eip1193": "^8.2.2",
     "@web3-react/metamask": "^8.2.3",
+    "brotli-wasm": "^2.0.1",
+    "install": "^0.13.0",
     "jszip": "^3.10.1",
+    "npm": "^10.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-drag-drop-files": "^2.3.10",
